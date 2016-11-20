@@ -1,0 +1,21 @@
+@(title: String, id: String, modalType: String="")(yesText: String = "Save", noText: String = "Close")(content: Html)
+<div class="modal fade" id="@id" tabindex="-1" role="dialog" aria-labelledby="@id-title" aria-hidden="true">
+    <div class="modal-dialog @modalType" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="@id-title">@title</h4>
+            </div>
+            <div class="modal-body">
+                <div id="@id-alerts"></div>
+                @content
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="@id-no" class="btn btn-secondary" data-dismiss="modal">@noText</button>
+                <button type="button" id="@id-yes" class="btn btn-primary">@yesText</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,14 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# An example controller showing a sample home page
+GET         /                     controllers.secure.HomeController.index
+
+
+GET         /login                controllers.secure.SecurityController.showLoginPage
+POST        /login                controllers.secure.SecurityController.login
+GET         /logout               controllers.secure.SecurityController.logout
+POST        /createAccount        controllers.secure.SecurityController.createAccount
+
+GET         /assets/*file         controllers.Assets.at(path="/public", file)
