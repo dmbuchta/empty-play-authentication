@@ -1,1 +1,1 @@
-INSERT INTO public."user" (id, email, password) VALUES (1, 'testemail@playframework.com', '>>	�`�Ԕ!��@o�x�{�Nb�~M����m6R�j����H4>��/��f�z2˿��bh}�N{[p�');
+INSERT INTO public."user" (id, email, password) VALUES (10000000, 'testemail@playframework.com', '>>	�`�Ԕ!��@o�x�{�Nb�~M����m6R�j����H4>��/��f�z2˿��bh}�N{[p�');

@@ -1,16 +1,8 @@
 package services.userservice;
 
 import models.User;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import play.Logger;
-import repositories.impl.JPAUserRepository;
-import services.UserService;
 import services.exceptions.EnfException;
 
 import javax.persistence.NoResultException;

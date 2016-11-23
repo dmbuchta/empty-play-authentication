@@ -18,7 +18,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "jquery" % "3.1.1",
   "org.webjars" % "font-awesome" % "4.6.3",
   "com.adrianhurt" %% "play-bootstrap" % "1.1-P25-B4" exclude("org.webjars", "jquery"),
-  "org.webjars.npm" % "tether" % "1.3.7" //tether is not required for bootstrap 4
+  "org.webjars.npm" % "tether" % "1.3.7" //tether is now required for bootstrap 4
 )
 lazy val akkaVersion = "2.4.11"
 libraryDependencies += "com.typesafe.akka" %% "akka-http-core" % akkaVersion

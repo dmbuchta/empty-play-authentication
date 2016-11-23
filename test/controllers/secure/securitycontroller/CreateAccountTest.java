@@ -1,8 +1,6 @@
 package controllers.secure.securitycontroller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import controllers.secure.Authenticator;
 import controllers.secure.SecurityController;
 import controllers.secure.routes;
 import models.User;
@@ -16,16 +14,10 @@ import play.mvc.Http;
 import play.mvc.Result;
 import services.exceptions.DuplicateEntityException;
 
-import java.io.IOException;
-
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static play.mvc.Http.Status.OK;
-import static play.mvc.Http.Status.SEE_OTHER;
-import static play.test.Helpers.contentAsString;
+import static utils.TestUtils.parseResult;
 
 /**
  * Created by Dan on 11/20/2016.
@@ -134,16 +126,4 @@ public class CreateAccountTest extends SecurityControllerTest {
             fail("This should never happen (2)");
         }
     }
-
-    private ObjectNode parseResult(Result result) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.readValue(contentAsString(result), ObjectNode.class);
-        } catch (IOException e) {
-            fail("Failed Parsing json response");
-        }
-        return null;
-    }
-
-
 }

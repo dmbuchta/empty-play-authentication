@@ -7,23 +7,10 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import play.Logger;
-import play.api.Configuration;
-import play.api.Environment;
-import play.api.Mode;
-import play.api.i18n.DefaultLangs;
-import play.api.i18n.DefaultMessagesApi;
 import play.data.Form;
-import play.data.FormFactory;
-import play.i18n.MessagesApi;
 import play.mvc.Http;
 import play.mvc.Result;
-import play.twirl.api.Html;
 import services.exceptions.EnfException;
-import utils.FakeTestRequest;
-
-import javax.validation.Validation;
-import javax.validation.ValidatorFactory;
-import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -50,11 +37,6 @@ public class LoginTest extends SecurityControllerTest {
         when(loginForm.bindFromRequest()).thenReturn(loginForm);
     }
 
-    @Override
-    public void tearDown() {
-        super.tearDown();
-    }
-
     @Test
     public void testLoginWithErrors() {
         Logger.debug("Testing login with form errors");
@@ -72,7 +54,7 @@ public class LoginTest extends SecurityControllerTest {
     @Test
     public void testGoodLogin() {
         Logger.debug("Testing a valid login");
-        User user = new User();
+        user = new User();
         user.setId(100000);
 
         when(loginForm.get()).thenReturn(user);

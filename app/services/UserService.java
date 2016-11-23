@@ -31,7 +31,7 @@ public class UserService {
         debug("Logging in User");
         String encryptedPass = encryptString(user.getEmail().toLowerCase() + user.getPassword());
         try {
-            return repository.findByEmailAndPassword(user.getEmail(), encryptedPass);
+            return repository.findByEmailAndPassword(user.getEmail().toLowerCase(), encryptedPass);
         } catch (NoResultException e) {
             debug("Entity Not Found!");
             throw new EnfException(e);
@@ -50,6 +50,7 @@ public class UserService {
                 debug("Duplicate Account Found!");
                 throw new DuplicateEntityException(e);
             }
+            Logger.error("An error occurred creating user", e);
             throw e;
         }
         return user;

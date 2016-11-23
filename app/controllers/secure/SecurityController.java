@@ -86,16 +86,39 @@ public class SecurityController extends Controller {
         @Constraints.MinLength(3)
         @Constraints.MaxLength(256)
         @Constraints.Email
-        public String newEmail;
+        private String newEmail;
 
         @Constraints.Required
         @Constraints.MinLength(6)
         @Constraints.MaxLength(256)
-        public String newPassword;
+        private String newPassword;
 
         @Constraints.Required
-        public String confirmPassword;
+        private String confirmPassword;
 
+        public String getNewEmail() {
+            return newEmail;
+        }
+
+        public void setNewEmail(String newEmail) {
+            this.newEmail = newEmail;
+        }
+
+        public String getNewPassword() {
+            return newPassword;
+        }
+
+        public void setNewPassword(String newPassword) {
+            this.newPassword = newPassword;
+        }
+
+        public String getConfirmPassword() {
+            return confirmPassword;
+        }
+
+        public void setConfirmPassword(String confirmPassword) {
+            this.confirmPassword = confirmPassword;
+        }
     }
 
 }

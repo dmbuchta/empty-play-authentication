@@ -24,8 +24,8 @@ public class CreateNewUserTest extends UserServiceTest {
     public void setUp() {
         super.setUp();
         newUserForm = new SecurityController.NewUserForm();
-        newUserForm.newEmail = "testemail@playframework.com";
-        newUserForm.newPassword = "password";
+        newUserForm.setNewEmail("testemail@playframework.com");
+        newUserForm.setNewPassword("password");
     }
 
     @Override
@@ -39,8 +39,8 @@ public class CreateNewUserTest extends UserServiceTest {
         try {
             doNothing().when(mockedRepo).save(any(User.class), eq(true));
             User user = userService.createNewUser(newUserForm);
-            assertTrue("Expected the user's email to match", user.getEmail().equalsIgnoreCase(newUserForm.newEmail));
-            assertTrue("Expected the user's password to match", user.getPassword().equals(newUserForm.newPassword));
+            assertTrue("Expected the user's email to match", user.getEmail().equalsIgnoreCase(newUserForm.getNewEmail()));
+            assertTrue("Expected the user's password to match", user.getPassword().equals(newUserForm.getNewPassword()));
             assertTrue("Expected the user's date to not be null", user.getCreationDate() != null);
             verify(mockedRepo).save(any(User.class), eq(true));
         } catch (PSQLException e) {

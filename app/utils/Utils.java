@@ -8,6 +8,7 @@ import play.libs.Json;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 
 /**
  * Created by Dan on 11/6/2016.
@@ -23,6 +24,9 @@ public class Utils {
         while (ex != null) {
             if (ex instanceof PSQLException) {
                 return ex.getMessage().contains("violates unique constraint");
+            } else if (ex instanceof SQLException) {
+                // This clause was added because of the H2 db testing only
+                return ((SQLException) ex).getErrorCode() == 23505;
             }
             ex = ex.getCause();
         }

@@ -14,6 +14,7 @@ import play.data.Form;
 import play.data.FormFactory;
 import play.mvc.Http;
 import services.UserService;
+import utils.UnitTest;
 
 import java.util.ArrayList;
 
@@ -22,8 +23,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by Dan on 11/19/2016.
  */
-@RunWith(MockitoJUnitRunner.class)
-public abstract class SecurityControllerTest {
+public abstract class SecurityControllerTest extends UnitTest {
 
     @Mock
     protected FormFactory formFactory;
@@ -37,13 +37,5 @@ public abstract class SecurityControllerTest {
     @Mock
     protected Http.Session session;
 
-    @Before
-    public void setUp() {
-        Logger.debug("Setting Up");
-    }
 
-    @After
-    public void tearDown() {
-        Logger.debug("Tearing Down");
-    }
 }

@@ -22,7 +22,7 @@ public class JPAUserRepository implements UserRepository {
 
     @Override
     public User findByEmailAndPassword(String email, String encryptedPass) throws NoResultException {
-        return (User) jpaApi.em().createQuery("SELECT u FROM User u where u.email = :email and u.encryptedPassword = :password")
+        return (User) jpaApi.em().createNamedQuery("User.login")
                 .setParameter("email", email)
                 .setParameter("password", encryptedPass)
                 .getSingleResult();

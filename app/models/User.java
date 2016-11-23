@@ -17,6 +17,9 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "\"user\"")
+@NamedQueries({
+        @NamedQuery(name = "User.login", query = "select u from User u where u.email = :email and u.encryptedPassword = :password")
+})
 public class User {
 
     @Id
@@ -81,11 +84,10 @@ public class User {
         this.encryptedPassword = encryptedPassword;
     }
 
-    public static final User createNewUser(SecurityController.NewUserForm newUserFormForm)
-    {
+    public static final User createNewUser(SecurityController.NewUserForm newUserFormForm) {
         User user = new User();
-        user.setEmail(newUserFormForm.newEmail.toLowerCase());
-        user.setPassword(newUserFormForm.newPassword);
+        user.setEmail(newUserFormForm.getNewEmail().toLowerCase());
+        user.setPassword(newUserFormForm.getNewPassword());
         user.creationDate = new Date();
         return user;
     }
