@@ -3,7 +3,7 @@ An Empty Play Application...
 
 This is an empty play application used for quickly getting an app up and running with JPA and Hibernate. 
 User authentication is already taken care of for you with a log in screen built with Bootstrap 4. No database interaction is needed.
-Additionaly Unit and Application tests have already been written in effort to provide bug free code.
+Additionaly, Unit and Application tests have been written in effort to provide bug free code.
 
 A running example can be found here: https://play-auth.herokuapp.com/
 
