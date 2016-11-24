@@ -1,6 +1,6 @@
 package services;
 
-import controllers.secure.SecurityController;
+import controllers.security.SecurityController;
 import models.User;
 import org.postgresql.util.PSQLException;
 import play.Logger;

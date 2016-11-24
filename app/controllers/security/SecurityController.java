@@ -1,6 +1,7 @@
-package controllers.secure;
+package controllers.security;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import controllers.secured.HomeController;
 import models.User;
 import org.postgresql.util.PSQLException;
 import play.Configuration;
@@ -37,7 +38,7 @@ public class SecurityController extends Controller {
     public Result showLoginPage() {
         if ( Authenticator.isUserLoggedIn(ctx()) )
         {
-            return redirect(routes.HomeController.index());
+            return redirect(controllers.secured.routes.HomeController.index());
         }
         return ok(views.html.login.render(formFactory.form(User.class), formFactory.form(NewUserForm.class), ssoClientId));
     }
@@ -52,7 +53,7 @@ public class SecurityController extends Controller {
             User user = loginForm.get();
             user = userService.login(user);
             Authenticator.setUser(ctx(), user);
-            return redirect(routes.HomeController.index());
+            return redirect(controllers.secured.routes.HomeController.index());
         } catch (EnfException e) {
             return Results.ok(views.html.login.render(loginForm, formFactory.form(NewUserForm.class), ssoClientId));
         }
@@ -70,7 +71,7 @@ public class SecurityController extends Controller {
             Authenticator.setUser(ctx(), user);
             json = Utils.createAjaxResponse(true);
             // TODO: REDIRECT TO ORIGINAL REQUEST URL!!
-            json.put("url", routes.HomeController.index().url());
+            json.put("url", controllers.secured.routes.HomeController.index().url());
         } catch (DuplicateEntityException e) {
             json = Utils.createAjaxResponse(false);
             json.put("message", "There is already an account with this email address.");

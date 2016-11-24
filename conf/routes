@@ -3,13 +3,13 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET         /                     controllers.secure.HomeController.index
+GET         /                     controllers.secured.HomeController.index
 
 
-GET         /login                controllers.secure.SecurityController.showLoginPage
-POST        /login                controllers.secure.SecurityController.login
-POST        /login/sso            controllers.secure.GoogleSsoController.login
-GET         /logout               controllers.secure.SecurityController.logout
-POST        /createAccount        controllers.secure.SecurityController.createAccount
+GET         /login                controllers.security.SecurityController.showLoginPage
+POST        /login                controllers.security.SecurityController.login
+POST        /login/sso            controllers.security.sso.GoogleSsoController.login
+GET         /logout               controllers.security.SecurityController.logout
+POST        /createAccount        controllers.security.SecurityController.createAccount
 
 GET         /assets/*file         controllers.Assets.at(path="/public", file)

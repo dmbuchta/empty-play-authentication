@@ -1,7 +1,5 @@
 package utils;
 
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 import play.Application;
 import play.inject.guice.GuiceApplicationBuilder;
 import play.test.WithServer;
@@ -9,7 +7,6 @@ import play.test.WithServer;
 /**
  * Created by Dan on 11/23/2016.
  */
-@RunWith(MockitoJUnitRunner.class)
 public abstract class ApplicationTest extends WithServer {
 
     @Override

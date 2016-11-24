@@ -1,6 +1,8 @@
-package controllers.secure;
+package controllers.security.sso;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import controllers.secured.HomeController;
+import controllers.security.Authenticator;
 import models.User;
 import org.hibernate.validator.constraints.NotEmpty;
 import play.Configuration;
@@ -62,7 +64,7 @@ public class GoogleSsoController extends Controller {
                         User user = jpaApi.withTransaction(() -> userService.findByEmail(email));
                         Authenticator.setUser(ctx, user);
                         ObjectNode responseJson = Utils.createAjaxResponse(true);
-                        responseJson.put("url", routes.HomeController.index().url());
+                        responseJson.put("url", controllers.secured.routes.HomeController.index().url());
                         return ok(responseJson);
                     }
                     throw new RuntimeException("Invalid aud from Google");

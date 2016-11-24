@@ -1,7 +1,7 @@
-package controllers.secure;
+package controllers.secured;
 
+import controllers.security.Authenticator;
 import play.data.FormFactory;
-import play.db.jpa.JPAApi;
 import play.mvc.Controller;
 import play.mvc.Security;
 

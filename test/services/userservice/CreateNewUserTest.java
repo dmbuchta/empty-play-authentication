@@ -1,6 +1,6 @@
 package services.userservice;
 
-import controllers.secure.SecurityController;
+import controllers.security.SecurityController;
 import models.User;
 import org.junit.Test;
 import org.postgresql.util.PSQLException;

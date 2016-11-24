@@ -1,4 +1,4 @@
-package controllers.secure;
+package controllers.secured;
 
 import play.data.FormFactory;
 import play.db.jpa.JPAApi;

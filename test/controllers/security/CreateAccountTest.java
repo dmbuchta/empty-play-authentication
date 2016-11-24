@@ -1,8 +1,6 @@
-package controllers.secure.securitycontroller;
+package controllers.security;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import controllers.secure.SecurityController;
-import controllers.secure.routes;
 import models.User;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -116,7 +114,7 @@ public class CreateAccountTest extends SecurityControllerTest {
         assertTrue("Response does not have the success key", json.has("success"));
         assertTrue("Response does not have correct success value", json.get("success").asBoolean());
         assertTrue("Response does not have the url key", json.has("url"));
-        assertEquals("Response does not have correct url value", routes.HomeController.index().url(), json.get("url").asText());
+        assertEquals("Response does not have correct url value", controllers.secured.routes.HomeController.index().url(), json.get("url").asText());
 
         try {
             verify(userService).createNewUser(newUserInput);

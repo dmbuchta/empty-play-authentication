@@ -1,6 +1,6 @@
-package controllers.secure.securitycontroller;
+package controllers.security;
 
-import controllers.secure.SecurityController;
+import controllers.security.SecurityController;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import play.Configuration;

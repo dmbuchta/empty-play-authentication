@@ -1,6 +1,7 @@
-package controllers.secure.securitycontroller;
+package controllers.security;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import controllers.secured.routes;
 import org.junit.Test;
 import play.Logger;
 import play.mvc.Http;
@@ -41,7 +42,7 @@ public class CreateAccountApplicationTest extends ApplicationTest {
         assertTrue("Response does not have success key", json.has("success"));
         assertTrue("Response does not have correct success value", json.get("success").asBoolean());
         assertTrue("Response does not have url key", json.has("url"));
-        assertEquals("Response does not have correct url value", "/", json.get("url").asText());
+        assertEquals("Response does not have correct url value", controllers.secured.routes.HomeController.index().url(), json.get("url").asText());
     }
 
     @Test

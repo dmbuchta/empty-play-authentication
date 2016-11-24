@@ -1,7 +1,5 @@
-package controllers.secure.securitycontroller;
+package controllers.security;
 
-import controllers.secure.Authenticator;
-import controllers.secure.routes;
 import models.User;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -59,7 +57,7 @@ public class LoginTest extends SecurityControllerTest {
         Result result = controller.login();
 
         assertEquals("Did not redirect after logging in", result.status(), SEE_OTHER);
-        assertEquals("Did not redirect to home page", routes.HomeController.index().url(), result.redirectLocation().get());
+        assertEquals("Did not redirect to home page", controllers.secured.routes.HomeController.index().url(), result.redirectLocation().get());
         assertTrue("User is not being stored on session", Authenticator.isUserLoggedIn(context));
         verify(userService).login(user);
     }

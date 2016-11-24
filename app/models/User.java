@@ -1,15 +1,11 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import controllers.secure.SecurityController;
+import controllers.security.SecurityController;
 import org.hibernate.validator.constraints.NotEmpty;
-import play.Logger;
-import play.data.Form;
 import play.data.validation.Constraints;
-import utils.Utils;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**

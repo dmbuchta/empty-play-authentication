@@ -1,4 +1,4 @@
-package controllers.secure;
+package controllers.security;
 
 import models.User;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +23,7 @@ public class Authenticator extends Security.Authenticator {
         return redirect(routes.SecurityController.login());
     }
 
-    static void setUser(Http.Context ctx, User user) {
+    public static void setUser(Http.Context ctx, User user) {
         ctx.session().put(USER_SESSION_PARAM, user.getId() + "");
     }
 
