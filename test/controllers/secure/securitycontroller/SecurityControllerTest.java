@@ -1,22 +1,13 @@
 package controllers.secure.securitycontroller;
 
 import controllers.secure.SecurityController;
-import models.User;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import play.Logger;
-import play.data.Form;
+import play.Configuration;
 import play.data.FormFactory;
 import play.mvc.Http;
 import services.UserService;
 import utils.UnitTest;
-
-import java.util.ArrayList;
 
 import static org.mockito.Mockito.when;
 
@@ -29,6 +20,8 @@ public abstract class SecurityControllerTest extends UnitTest {
     protected FormFactory formFactory;
     @Mock
     protected UserService userService;
+    @Mock
+    protected Configuration configuration;
     @InjectMocks
     protected SecurityController controller;
 
@@ -37,5 +30,10 @@ public abstract class SecurityControllerTest extends UnitTest {
     @Mock
     protected Http.Session session;
 
-
+    @Override
+    public void setUp() {
+        super.setUp();
+        Http.Context.current.set(context);
+        when(context.session()).thenReturn(session);
+    }
 }

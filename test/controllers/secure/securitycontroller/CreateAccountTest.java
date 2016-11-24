@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.postgresql.util.PSQLException;
 import play.Logger;
 import play.data.Form;
-import play.mvc.Http;
 import play.mvc.Result;
 import services.exceptions.DuplicateEntityException;
 
@@ -32,8 +31,6 @@ public class CreateAccountTest extends SecurityControllerTest {
     @Override
     public void setUp() {
         super.setUp();
-        Http.Context.current.set(context);
-        when(context.session()).thenReturn(session);
         when(formFactory.form(SecurityController.NewUserForm.class)).thenReturn(newUserForm);
         when(newUserForm.bindFromRequest()).thenReturn(newUserForm);
     }
@@ -59,6 +56,7 @@ public class CreateAccountTest extends SecurityControllerTest {
 
         ArgumentCaptor<SecurityController.NewUserForm> argument = ArgumentCaptor.forClass(SecurityController.NewUserForm.class);
         try {
+            verify(newUserForm, times(2)).hasErrors();
             verify(userService, never()).createNewUser(argument.capture());
         } catch (PSQLException e) {
             fail("This should never happen (2)");

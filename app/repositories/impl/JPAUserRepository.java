@@ -29,6 +29,13 @@ public class JPAUserRepository implements UserRepository {
     }
 
     @Override
+    public User findByEmail(String email) throws NoResultException {
+        return (User) jpaApi.em().createNamedQuery("User.findByEmail")
+                .setParameter("email", email)
+                .getSingleResult();
+    }
+
+    @Override
     public void save(User user, boolean flushImmediately) throws PSQLException {
         jpaApi.em().persist(user);
         if ( flushImmediately )

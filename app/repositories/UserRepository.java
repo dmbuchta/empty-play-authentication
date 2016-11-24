@@ -12,6 +12,8 @@ public interface UserRepository {
 
     User findByEmailAndPassword(String email, String encryptedPass) throws NoResultException;
 
+    User findByEmail(String email) throws NoResultException;
+
     void save(User user, boolean flushImmediately) throws PSQLException;
 
     void edit(User user);

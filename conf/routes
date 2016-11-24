@@ -8,6 +8,7 @@ GET         /                     controllers.secure.HomeController.index
 
 GET         /login                controllers.secure.SecurityController.showLoginPage
 POST        /login                controllers.secure.SecurityController.login
+POST        /login/sso            controllers.secure.GoogleSsoController.login
 GET         /logout               controllers.secure.SecurityController.logout
 POST        /createAccount        controllers.secure.SecurityController.createAccount
 

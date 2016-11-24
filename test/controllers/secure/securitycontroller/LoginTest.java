@@ -8,7 +8,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import play.Logger;
 import play.data.Form;
-import play.mvc.Http;
 import play.mvc.Result;
 import services.exceptions.EnfException;
 
@@ -30,8 +29,6 @@ public class LoginTest extends SecurityControllerTest {
     @Override
     public void setUp() {
         super.setUp();
-        Http.Context.current.set(context);
-        when(context.session()).thenReturn(session);
         when(session.get(any(String.class))).thenReturn("1");
         when(formFactory.form(User.class)).thenReturn(loginForm);
         when(loginForm.bindFromRequest()).thenReturn(loginForm);

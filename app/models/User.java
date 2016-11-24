@@ -18,7 +18,8 @@ import java.util.Date;
 @Entity
 @Table(name = "\"user\"")
 @NamedQueries({
-        @NamedQuery(name = "User.login", query = "select u from User u where u.email = :email and u.encryptedPassword = :password")
+        @NamedQuery(name = "User.login", query = "select u from User u where u.email = :email and u.encryptedPassword = :password"),
+        @NamedQuery(name = "User.findByEmail", query = "select u from User u where u.email = :email")
 })
 public class User {
 

@@ -3,6 +3,7 @@ package controllers.secure;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.User;
 import org.postgresql.util.PSQLException;
+import play.Configuration;
 import play.data.Form;
 import play.data.FormFactory;
 import play.data.validation.Constraints;
@@ -24,22 +25,28 @@ public class SecurityController extends Controller {
 
     private FormFactory formFactory;
     private UserService userService;
+    private String ssoClientId;
 
     @Inject
-    public SecurityController(FormFactory formFactory, UserService userService) {
+    public SecurityController(FormFactory formFactory, UserService userService, Configuration configuration) {
         this.formFactory = formFactory;
         this.userService = userService;
+        this.ssoClientId = configuration.getString("sso.client.id");
     }
 
     public Result showLoginPage() {
-        return ok(views.html.login.render(formFactory.form(User.class), formFactory.form(NewUserForm.class)));
+        if ( Authenticator.isUserLoggedIn(ctx()) )
+        {
+            return redirect(routes.HomeController.index());
+        }
+        return ok(views.html.login.render(formFactory.form(User.class), formFactory.form(NewUserForm.class), ssoClientId));
     }
 
     @Transactional(readOnly = true)
     public Result login() {
         Form<User> loginForm = formFactory.form(User.class).bindFromRequest();
         if (loginForm.hasErrors()) {
-            return Results.ok(views.html.login.render(loginForm, formFactory.form(NewUserForm.class)));
+            return Results.ok(views.html.login.render(loginForm, formFactory.form(NewUserForm.class), ssoClientId));
         }
         try {
             User user = loginForm.get();
@@ -47,7 +54,7 @@ public class SecurityController extends Controller {
             Authenticator.setUser(ctx(), user);
             return redirect(routes.HomeController.index());
         } catch (EnfException e) {
-            return Results.ok(views.html.login.render(loginForm, formFactory.form(NewUserForm.class)));
+            return Results.ok(views.html.login.render(loginForm, formFactory.form(NewUserForm.class), ssoClientId));
         }
     }
 
