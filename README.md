@@ -9,10 +9,16 @@ A running example can be found here: https://play-auth.herokuapp.com/
 
 =================================
 
-## Heroku Deployment only needs two steps:
+## Heroku Deployment:
 - Generate a secret key (https://www.playframework.com/documentation/2.5.x/ApplicationSecret#generating-an-application-secret).
-- Add the key to your enviromental variables with the name "APPLICATION_SECRET" (https://devcenter.heroku.com/articles/config-vars#setting-up-config-vars-for-a-deployed-application).
-- push away :)
+- Add the key to your environmental variables with the name "APPLICATION_SECRET" (https://devcenter.heroku.com/articles/config-vars#setting-up-config-vars-for-a-deployed-application).
+- If for some reason you don't want to use environmental variable, change the following line in your application.conf file: ``` play.crypto.secret=<YOUR SECRET KEY HERE> ```
+- That's it :) now push to your git repo on heroku.
+
+## Google Sign-In:
+- To add Google Sign-In capabilite, you need to get a Client ID for your app (https://developers.google.com/identity/sign-in/web/devconsole-project).
+- Once you have your Client ID, set it as an environmental variable with the name "SSO_CLIENT_ID".
+- If for some reason you don't want to use environmental variable, change the following line in your application.conf file: ``` sso.client.id=<YOUR CLIENT ID HERE> ```
 
 =================================
 
