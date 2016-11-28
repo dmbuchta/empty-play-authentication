@@ -22,5 +22,5 @@ A running example can be found here: https://play-auth.herokuapp.com/
 
 ## Facebook Sign-In:
 - To add Facebook Sign-In capabilities, you need to get an App ID and Secret for your app (https://developers.facebook.com/docs/facebook-login/web).
-- Once you have your App ID and secret, set it as an environmental variable with the names "SSO_FB_APP_ID" and "SSO_FB_APP_SECRET".
+- Once you have your App ID and secret, set them as environmental variables with the names "SSO_FB_APP_ID" and "SSO_FB_APP_SECRET".
 - If for some reason you don't want to use environmental variables, change the following lines in your application.conf file: ``` sso.fb.app.id=<YOUR APP ID HERE>``` and ```sso.fb.app.secret=<YOUR APP SECRET HERE>```
