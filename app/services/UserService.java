@@ -41,7 +41,7 @@ public class UserService {
     public User findByEmail(String email) throws EnfException {
         debug("Looking for User with email: " + email );
         try {
-            return repository.findByEmail(email);
+            return repository.findByEmail(email.toLowerCase());
         } catch (NoResultException e) {
             debug("Entity Not Found!");
             throw new EnfException(e);

@@ -1,0 +1,47 @@
+package controllers.security.sso;
+
+import org.junit.Test;
+import play.Logger;
+import play.inject.guice.GuiceApplicationBuilder;
+import play.mvc.Result;
+import utils.ApplicationTest;
+import utils.Configs;
+
+import static org.junit.Assert.*;
+import static play.mvc.Http.Status.OK;
+import static play.test.Helpers.*;
+
+/**
+ * Created by Dan on 11/27/2016.
+ */
+public class SsoApplicationTest extends ApplicationTest {
+
+    private static final String FAKE_CLIENT_ID = "FAKE_CLIENT_ID";
+    private static final String FAKE_APP_ID = "FAKE_APP_ID";
+    private static final String FAKE_APP_SECRET = "FAKE_APP_SECRET";
+
+    @Override
+    public GuiceApplicationBuilder configureApp(GuiceApplicationBuilder builder) {
+        return super.configureApp(builder)
+                .configure(Configs.FB_APP_ID, FAKE_APP_ID)
+                .configure(Configs.FB_APP_SECRET, FAKE_APP_SECRET)
+                .configure(Configs.GOOGLE_CLIENT_ID, FAKE_CLIENT_ID);
+    }
+
+    @Test
+    public void testShowLoginPage() {
+        Logger.debug("Testing the login page with both Google and Facebook Sign in configured");
+
+        Result result = route(fakeRequest("GET", "/login"));
+
+        assertEquals("Status is not OK", OK, result.status());
+        assertTrue("Result is not text/html", result.contentType().toString().contains("text/html"));
+
+        String html = contentAsString(result);
+        assertFalse("Login page has incorrect sign in header", html.contains("Sign in to your account"));
+        assertTrue("Login page does not have the Facebook Sign in button", html.contains("Sign in with Facebook"));
+        assertTrue("Login page does not have the Google Sign in button", html.contains("Sign in with Google"));
+        assertTrue("Login page does not have create account modal", html.contains("Create Account"));
+        assertFalse("Login page is showing an error message", html.contains("There was a problem with your login"));
+    }
+}

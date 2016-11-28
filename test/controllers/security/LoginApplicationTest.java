@@ -29,7 +29,9 @@ public class LoginApplicationTest extends ApplicationTest {
         assertTrue("Result is not text/html", result.contentType().toString().contains("text/html"));
 
         String html = contentAsString(result);
-        assertTrue("Login page does not have the Log in Form", html.contains("Log in to your account"));
+        assertTrue("Login page does not have the correct sign in header", html.contains("Sign in to your account"));
+        assertFalse("Login page has the Facebook Sign in button", html.contains("Sign in with Facebook"));
+        assertFalse("Login page has the Google Sign in button", html.contains("Sign in with Google"));
         assertTrue("Login page does not have create account modal", html.contains("Create Account"));
         assertFalse("Login page is showing an error message", html.contains("There was a problem with your login"));
     }
@@ -79,9 +81,9 @@ public class LoginApplicationTest extends ApplicationTest {
         assertTrue("Result is not text/html", result.contentType().toString().contains("text/html"));
 
         String html = contentAsString(result);
-        assertTrue("Login page does not have the Log in Form", html.contains("Log in to your account"));
+        assertTrue("Login page does not have the Log in Form", html.contains("Sign in to your account"));
         assertTrue("Login page does not have create account modal", html.contains("Create Account"));
-        assertTrue("Login page is showing an error message", html.contains("There was a problem with your login"));
+        assertTrue("Login page is not showing an error message", html.contains("There was a problem with your login"));
     }
 
     @Test

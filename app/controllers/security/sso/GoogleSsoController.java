@@ -19,6 +19,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import services.UserService;
 import services.exceptions.EnfException;
+import utils.Configs;
 import utils.Utils;
 
 import javax.inject.Inject;
@@ -44,7 +45,7 @@ public class GoogleSsoController extends Controller {
         this.formFactory = formFactory;
         this.userService = userService;
         this.wsClient = wsClient;
-        this.ssoClientId = configuration.getString("sso.client.id");
+        this.ssoClientId = configuration.getString(Configs.GOOGLE_CLIENT_ID);
     }
 
     @Transactional(readOnly = true)
@@ -79,14 +80,6 @@ public class GoogleSsoController extends Controller {
                     return ok(json);
                 });
         return result;
-    }
-
-    private WSResponse debugResponse(WSResponse response) {
-        Logger.debug("HEADERS {}", response.getAllHeaders());
-        Logger.debug("Status {}", response.getStatus());
-        Logger.debug("Body {}", response.getBody());
-        Logger.debug("URI {}", response.getUri());
-        return response;
     }
 
     public static class GoogleSsoForm {

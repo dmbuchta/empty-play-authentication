@@ -36,8 +36,8 @@ public class LoginTest extends UserServiceTest {
     }
 
     @Test
-    public void testGoodLogin() {
-        Logger.debug("Running Good Login Test");
+    public void testGoodLoginWithEmailAndPassword() {
+        Logger.debug("Running Good Login Test with email and password");
         when(mockedRepo.findByEmailAndPassword(eq(user.getEmail()), not(eq(user.getPassword())))).thenReturn(user);
 
         assertTrue("The user was expected to be returned", userService.login(user).equals(user));
@@ -45,8 +45,8 @@ public class LoginTest extends UserServiceTest {
     }
 
     @Test
-    public void testBadLogin() {
-        Logger.debug("Running Bad Login Test");
+    public void testBadLoginWithEmailAndPassword() {
+        Logger.debug("Running Bad Login Test with email and password");
         when(mockedRepo.findByEmailAndPassword(eq(user.getEmail()), not(eq(user.getPassword())))).thenThrow(new NoResultException());
 
         try {
@@ -54,6 +54,30 @@ public class LoginTest extends UserServiceTest {
         } catch (Exception e) {
             assertTrue("An EnfException was expected to be thrown (1)", e instanceof EnfException);
             verify(mockedRepo).findByEmailAndPassword(eq(user.getEmail()), any(String.class));
+            return;
+        }
+        fail("An EnfException was expected to be thrown (2)");
+    }
+
+    @Test
+    public void testLoginWithEmailOnly() {
+        Logger.debug("Running Good Login Test with email only");
+        when(mockedRepo.findByEmail(eq(user.getEmail()))).thenReturn(user);
+
+        assertTrue("The user was expected to be returned", userService.findByEmail(user.getEmail()).equals(user));
+        verify(mockedRepo).findByEmail(eq(user.getEmail()));
+    }
+
+    @Test
+    public void testBadLoginWithEmailOnly() {
+        Logger.debug("Running Bad Login Test with email only");
+        when(mockedRepo.findByEmail(eq(user.getEmail()))).thenThrow(new NoResultException());
+
+        try {
+            userService.findByEmail(user.getEmail());
+        } catch (Exception e) {
+            assertTrue("An EnfException was expected to be thrown (1)", e instanceof EnfException);
+            verify(mockedRepo).findByEmail(eq(user.getEmail()));
             return;
         }
         fail("An EnfException was expected to be thrown (2)");

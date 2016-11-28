@@ -20,6 +20,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import services.UserService;
 import services.exceptions.EnfException;
+import utils.Configs;
 import utils.UnitTest;
 
 import java.util.concurrent.CompletableFuture;
@@ -39,6 +40,7 @@ import static utils.TestUtils.parseResult;
 public class GoogleSsoControllerTest extends UnitTest {
 
     private static final String FAKE_CLIENT_ID = "THIS_IS_A_FAKE_GOOGLE_CLIENT_ID";
+    private static final String FAKE_TOKEN = "FAKE_TOKEN";
     private GoogleSsoController controller;
 
     @Mock
@@ -71,7 +73,9 @@ public class GoogleSsoControllerTest extends UnitTest {
         when(context.session()).thenReturn(session);
         when(formFactory.form(GoogleSsoController.GoogleSsoForm.class)).thenReturn(ssoForm);
         when(ssoForm.bindFromRequest()).thenReturn(ssoForm);
-        when(configuration.getString(eq("sso.client.id"))).thenReturn(FAKE_CLIENT_ID);
+        when(configuration.getString(eq(Configs.GOOGLE_CLIENT_ID))).thenReturn(FAKE_CLIENT_ID);
+        when(ssoForm.get()).thenReturn(ssoInfo);
+        when(ssoInfo.getId_token()).thenReturn(FAKE_TOKEN);
         controller = new GoogleSsoController(jpaApi, formFactory, userService, wsClient, configuration);
     }
 
@@ -136,8 +140,8 @@ public class GoogleSsoControllerTest extends UnitTest {
         assertFalse("Response has formErrors when it shouldn't", json.has("formErrors"));
         assertTrue("Response does not have the success key", json.has("success"));
         assertFalse("Response does not have correct success value", json.get("success").asBoolean());
-        assertTrue("Response has an error message", json.has("message"));
-        assertEquals("Response has an error message", "No account", json.get("message").asText());
+        assertTrue("Response does not have an error message", json.has("message"));
+        assertEquals("Response has an incorrect error message", "No account", json.get("message").asText());
 
         verify(jpaApi).withTransaction(supplierArgumentCaptor.capture());
     }
@@ -166,8 +170,6 @@ public class GoogleSsoControllerTest extends UnitTest {
         CompletableFuture<JsonNode> jsonPromise = CompletableFuture.completedFuture(json);
         ArgumentCaptor<Function> functionArgumentCaptor = ArgumentCaptor.forClass(Function.class);
 
-        when(ssoForm.get()).thenReturn(ssoInfo);
-        when(ssoInfo.getId_token()).thenReturn("");
         when(wsClient.url(anyString())).thenReturn(wsRequest);
         when(wsRequest.setQueryParameter(anyString(), anyString())).thenReturn(wsRequest);
         when(wsRequest.post(anyString())).thenReturn(wsResponsePromise);

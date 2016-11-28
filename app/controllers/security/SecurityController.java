@@ -1,8 +1,8 @@
 package controllers.security;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import controllers.secured.HomeController;
 import models.User;
+import org.apache.commons.lang3.StringUtils;
 import org.postgresql.util.PSQLException;
 import play.Configuration;
 import play.data.Form;
@@ -15,6 +15,7 @@ import play.mvc.Results;
 import services.UserService;
 import services.exceptions.DuplicateEntityException;
 import services.exceptions.EnfException;
+import utils.Configs;
 import utils.Utils;
 
 import javax.inject.Inject;
@@ -27,27 +28,31 @@ public class SecurityController extends Controller {
     private FormFactory formFactory;
     private UserService userService;
     private String ssoClientId;
+    private String fbAppId;
 
     @Inject
     public SecurityController(FormFactory formFactory, UserService userService, Configuration configuration) {
         this.formFactory = formFactory;
         this.userService = userService;
-        this.ssoClientId = configuration.getString("sso.client.id");
+        this.ssoClientId = configuration.getString(Configs.GOOGLE_CLIENT_ID);
+        String appId = configuration.getString(Configs.FB_APP_ID);
+        if (StringUtils.isNoneBlank(appId, configuration.getString(Configs.FB_APP_SECRET))) {
+            this.fbAppId = appId;
+        }
     }
 
     public Result showLoginPage() {
-        if ( Authenticator.isUserLoggedIn(ctx()) )
-        {
+        if (Authenticator.isUserLoggedIn(ctx())) {
             return redirect(controllers.secured.routes.HomeController.index());
         }
-        return ok(views.html.login.render(formFactory.form(User.class), formFactory.form(NewUserForm.class), ssoClientId));
+        return ok(views.html.login.render(formFactory.form(User.class), formFactory.form(NewUserForm.class), ssoClientId, fbAppId));
     }
 
     @Transactional(readOnly = true)
     public Result login() {
         Form<User> loginForm = formFactory.form(User.class).bindFromRequest();
         if (loginForm.hasErrors()) {
-            return Results.ok(views.html.login.render(loginForm, formFactory.form(NewUserForm.class), ssoClientId));
+            return Results.ok(views.html.login.render(loginForm, formFactory.form(NewUserForm.class), ssoClientId, fbAppId));
         }
         try {
             User user = loginForm.get();
@@ -55,7 +60,7 @@ public class SecurityController extends Controller {
             Authenticator.setUser(ctx(), user);
             return redirect(controllers.secured.routes.HomeController.index());
         } catch (EnfException e) {
-            return Results.ok(views.html.login.render(loginForm, formFactory.form(NewUserForm.class), ssoClientId));
+            return Results.ok(views.html.login.render(loginForm, formFactory.form(NewUserForm.class), ssoClientId, fbAppId));
         }
     }
 

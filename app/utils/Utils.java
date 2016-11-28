@@ -1,9 +1,12 @@
 package utils;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.postgresql.util.PSQLException;
+import play.Logger;
 import play.data.Form;
 import play.libs.Json;
+import play.libs.ws.WSResponse;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -45,6 +48,14 @@ public class Utils {
         if (hasError) {
             response.set("formErrors", form.errorsAsJson());
         }
+        return response;
+    }
+
+    public static WSResponse debugResponse(WSResponse response) {
+        Logger.debug("HEADERS {}", response.getAllHeaders());
+        Logger.debug("Status {}", response.getStatus());
+        Logger.debug("Body {}", response.getBody());
+        Logger.debug("URI {}", response.getUri());
         return response;
     }
 
