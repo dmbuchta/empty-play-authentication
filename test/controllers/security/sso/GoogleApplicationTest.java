@@ -39,8 +39,8 @@ public class GoogleApplicationTest extends ApplicationTest {
 
         String html = contentAsString(result);
         assertFalse("Login page has incorrect sign in header", html.contains("Sign in to your account"));
-        assertFalse("Login page has the Facebook Sign in button", html.contains("Sign in with Facebook"));
-        assertTrue("Login page does not have the Google Sign in button", html.contains("Sign in with Google"));
+        assertFalse("Login page has the Facebook Sign in button", html.contains("id=\"fb-login-button\""));
+        assertTrue("Login page does not have the Google Sign in button", html.contains("id=\"google-login-button\""));
         assertTrue("Login page does not have create account modal", html.contains("Create Account"));
         assertFalse("Login page is showing an error message", html.contains("There was a problem with your login"));
     }

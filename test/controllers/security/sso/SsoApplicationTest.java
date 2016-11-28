@@ -38,9 +38,12 @@ public class SsoApplicationTest extends ApplicationTest {
         assertTrue("Result is not text/html", result.contentType().toString().contains("text/html"));
 
         String html = contentAsString(result);
+
+        Logger.debug(html);
+
         assertFalse("Login page has incorrect sign in header", html.contains("Sign in to your account"));
-        assertTrue("Login page does not have the Facebook Sign in button", html.contains("Sign in with Facebook"));
-        assertTrue("Login page does not have the Google Sign in button", html.contains("Sign in with Google"));
+        assertTrue("Login page does not have the Facebook Sign in button", html.contains("id=\"fb-login-button\""));
+        assertTrue("Login page does not have the Google Sign in button", html.contains("id=\"google-login-button\""));
         assertTrue("Login page does not have create account modal", html.contains("Create Account"));
         assertFalse("Login page is showing an error message", html.contains("There was a problem with your login"));
     }
