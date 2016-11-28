@@ -7,13 +7,9 @@ import play.mvc.Result;
 import utils.ApplicationTest;
 import utils.Configs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static play.mvc.Http.Status.OK;
-import static play.test.Helpers.contentAsString;
-import static play.test.Helpers.fakeRequest;
-import static play.test.Helpers.route;
+import static play.test.Helpers.*;
 
 /**
  * Created by Dan on 11/27/2016.
@@ -34,7 +30,7 @@ public class FacebookApplicationTest extends ApplicationTest {
     public void testShowLoginPage() {
         Logger.debug("Testing the login page with Facebook Sign in configured");
 
-        Result result = route(fakeRequest("GET", "/login"));
+        Result result = route(fakeRequest("GET", controllers.security.routes.SecurityController.showLoginPage().url()));
 
         assertEquals("Status is not OK", OK, result.status());
         assertTrue("Result is not text/html", result.contentType().toString().contains("text/html"));

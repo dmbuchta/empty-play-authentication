@@ -1,11 +1,10 @@
 package controllers.security.sso;
 
+import actions.CheckGoogleConfigAction;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import controllers.secured.HomeController;
 import controllers.security.Authenticator;
 import models.User;
 import org.hibernate.validator.constraints.NotEmpty;
-import play.Configuration;
 import play.Logger;
 import play.data.Form;
 import play.data.FormFactory;
@@ -17,9 +16,9 @@ import play.libs.ws.WSResponse;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import play.mvc.With;
 import services.UserService;
 import services.exceptions.EnfException;
-import utils.Configs;
 import utils.Utils;
 
 import javax.inject.Inject;
@@ -33,34 +32,35 @@ public class GoogleSsoController extends Controller {
 
     private static final String GOOGLE_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v3/tokeninfo";
 
-    private String ssoClientId;
     private JPAApi jpaApi;
     private FormFactory formFactory;
     private UserService userService;
     private WSClient wsClient;
 
     @Inject
-    public GoogleSsoController(JPAApi jpaApi, FormFactory formFactory, UserService userService, WSClient wsClient, Configuration configuration) {
+    public GoogleSsoController(JPAApi jpaApi, FormFactory formFactory, UserService userService, WSClient wsClient) {
         this.jpaApi = jpaApi;
         this.formFactory = formFactory;
         this.userService = userService;
         this.wsClient = wsClient;
-        this.ssoClientId = configuration.getString(Configs.GOOGLE_CLIENT_ID);
     }
 
     @Transactional(readOnly = true)
+    @With(CheckGoogleConfigAction.class)
     public CompletionStage<Result> login() {
         Form<GoogleSsoForm> loginForm = formFactory.form(GoogleSsoForm.class).bindFromRequest();
         if (loginForm.hasErrors()) {
             return CompletableFuture.completedFuture(ok(Utils.createAjaxResponse(loginForm)));
         }
         final Http.Context ctx = ctx();
+        final String clientId = (String) ctx.args.get(CheckGoogleConfigAction.CLIENT_ID);
         CompletionStage<Result> result = wsClient.url(GOOGLE_TOKEN_ENDPOINT)
                 .setQueryParameter("id_token", loginForm.get().getId_token())
-                .post("")
+                .get()
+                .thenApply(Utils::debugResponse)
                 .thenApply(WSResponse::asJson)
                 .thenApplyAsync((json) -> {
-                    if (json.has("aud") && json.get("aud").asText("").equals(ssoClientId)) {
+                    if (json.has("aud") && json.get("aud").asText("").equals(clientId)) {
                         String email = json.get("email").asText();
                         User user = jpaApi.withTransaction(() -> userService.findByEmail(email));
                         Authenticator.setUser(ctx, user);

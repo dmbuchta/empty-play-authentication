@@ -32,7 +32,7 @@ public class SsoApplicationTest extends ApplicationTest {
     public void testShowLoginPage() {
         Logger.debug("Testing the login page with both Google and Facebook Sign in configured");
 
-        Result result = route(fakeRequest("GET", "/login"));
+        Result result = route(fakeRequest("GET", controllers.security.routes.SecurityController.showLoginPage().url()));
 
         assertEquals("Status is not OK", OK, result.status());
         assertTrue("Result is not text/html", result.contentType().toString().contains("text/html"));

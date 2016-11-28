@@ -1,13 +1,12 @@
 package controllers.security.sso;
 
+import actions.CheckGoogleConfigAction;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import controllers.secured.HomeController;
 import models.User;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import play.Configuration;
 import play.Logger;
 import play.data.Form;
 import play.data.FormFactory;
@@ -20,9 +19,10 @@ import play.mvc.Http;
 import play.mvc.Result;
 import services.UserService;
 import services.exceptions.EnfException;
-import utils.Configs;
 import utils.UnitTest;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
@@ -52,8 +52,6 @@ public class GoogleSsoControllerTest extends UnitTest {
     @Mock
     private WSClient wsClient;
     @Mock
-    private Configuration configuration;
-    @Mock
     private Form<GoogleSsoController.GoogleSsoForm> ssoForm;
     @Mock
     private GoogleSsoController.GoogleSsoForm ssoInfo;
@@ -65,18 +63,23 @@ public class GoogleSsoControllerTest extends UnitTest {
     private WSRequest wsRequest;
     @Mock
     private CompletionStage<WSResponse> wsResponsePromise;
+    @Mock
+    private CompletionStage<WSResponse> unusedPromise;
 
     @Override
     public void setUp() {
         super.setUp();
+        Map<String, Object> contextArgs = new HashMap<>();
+        contextArgs.put(CheckGoogleConfigAction.CLIENT_ID, FAKE_CLIENT_ID);
+        context.args = contextArgs;
+
         Http.Context.current.set(context);
         when(context.session()).thenReturn(session);
         when(formFactory.form(GoogleSsoController.GoogleSsoForm.class)).thenReturn(ssoForm);
         when(ssoForm.bindFromRequest()).thenReturn(ssoForm);
-        when(configuration.getString(eq(Configs.GOOGLE_CLIENT_ID))).thenReturn(FAKE_CLIENT_ID);
         when(ssoForm.get()).thenReturn(ssoInfo);
         when(ssoInfo.getId_token()).thenReturn(FAKE_TOKEN);
-        controller = new GoogleSsoController(jpaApi, formFactory, userService, wsClient, configuration);
+        controller = new GoogleSsoController(jpaApi, formFactory, userService, wsClient);
     }
 
     @Test
@@ -172,7 +175,8 @@ public class GoogleSsoControllerTest extends UnitTest {
 
         when(wsClient.url(anyString())).thenReturn(wsRequest);
         when(wsRequest.setQueryParameter(anyString(), anyString())).thenReturn(wsRequest);
-        when(wsRequest.post(anyString())).thenReturn(wsResponsePromise);
+        when(wsRequest.get()).thenReturn(unusedPromise);
+        when(unusedPromise.thenApply(functionArgumentCaptor.capture())).thenReturn(wsResponsePromise);
         when(wsResponsePromise.thenApply(functionArgumentCaptor.capture())).thenReturn(wsResponsePromise);
         when(wsResponsePromise.thenApply(functionArgumentCaptor.capture())).thenReturn(jsonPromise);
     }
