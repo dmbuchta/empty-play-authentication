@@ -62,6 +62,14 @@
   background-image: linear-gradient(@origin, @start, @stop);
 }
 
+.radial(@innerColor: #555, @outerColor: #333, @pos: center, @colorStop: 100%)  {
+  background-image: -moz-radial-gradient(@pos, circle, @innerColor, @outerColor @colorStop); // FF 3.6+
+  background-image: -ms-radial-gradient(@pos, circle, @innerColor, @outerColor @colorStop); // IE10
+  background-image: -webkit-gradient(radial, center center, 0, center center, 460, from(@innerColor), to(@outerColor)); // Android 2.3, Safari 4+, Chrome 2+
+  background-image: -webkit-radial-gradient(@pos, circle, @innerColor, @outerColor @colorStop); // Safari 5.1+, Chrome 10+
+  background-image: -o-radial-gradient(@pos, circle, @innerColor, @outerColor @colorStop); // Opera 11.10
+}
+
 /* Implementation
 #someDiv {
   .gradient(left, #663333, #333333);
@@ -93,7 +101,7 @@
 }
 */
 
-@base: #663333;
+@base: #eaeeef;
 @complement1: spin(@base, 180);
 @complement2: darken(spin(@base, 180), 5%);
 @lighten1: lighten(@base, 15%);
@@ -107,7 +115,6 @@
 .five  {color: @lighten2;}
 */
 
-@base: #663333;
 @lighter1: lighten(spin(@base, 5), 10%);
 @lighter2: lighten(spin(@base, 10), 20%);
 @darker1: darken(spin(@base, -5), 10%);

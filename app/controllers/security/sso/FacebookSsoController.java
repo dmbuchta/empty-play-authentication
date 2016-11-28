@@ -2,6 +2,7 @@ package controllers.security.sso;
 
 import actions.CheckFacebookConfigAction;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import controllers.BaseController;
 import controllers.security.Authenticator;
 import models.User;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -28,7 +29,7 @@ import java.util.concurrent.CompletionStage;
 /**
  * Created by Dan on 11/26/2016.
  */
-public class FacebookSsoController extends Controller {
+public class FacebookSsoController extends BaseController {
 
     private static final String FB_TOKEN_ENDPOINT = "https://graph.facebook.com/debug_token";
     private static final String FB_USER_EMAIL_ENDPOINT = "https://graph.facebook.com/v2.8/";

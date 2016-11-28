@@ -1,6 +1,7 @@
 import com.google.inject.AbstractModule;
 import java.time.Clock;
 
+import play.http.DefaultHttpErrorHandler;
 import repositories.UserRepository;
 import repositories.impl.JPAUserRepository;
 import services.ApplicationTimer;
@@ -25,6 +26,7 @@ public class Module extends AbstractModule {
         // application starts.
         bind(ApplicationTimer.class).asEagerSingleton();
         bind(UserRepository.class).to(JPAUserRepository.class);
+        bind(DefaultHttpErrorHandler.class).to(ErrorHandler.class);
     }
 
 }

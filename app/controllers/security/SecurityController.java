@@ -1,6 +1,7 @@
 package controllers.security;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import controllers.BaseController;
 import models.User;
 import org.apache.commons.lang3.StringUtils;
 import org.postgresql.util.PSQLException;
@@ -9,7 +10,6 @@ import play.data.Form;
 import play.data.FormFactory;
 import play.data.validation.Constraints;
 import play.db.jpa.Transactional;
-import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Results;
 import services.UserService;
@@ -23,7 +23,7 @@ import javax.inject.Inject;
 /**
  * Created by Dan on 11/6/2016.
  */
-public class SecurityController extends Controller {
+public class SecurityController extends BaseController {
 
     private FormFactory formFactory;
     private UserService userService;

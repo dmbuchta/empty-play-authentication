@@ -2,6 +2,7 @@ package controllers.security.sso;
 
 import actions.CheckGoogleConfigAction;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import controllers.BaseController;
 import controllers.security.Authenticator;
 import models.User;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -28,7 +29,7 @@ import java.util.concurrent.CompletionStage;
 /**
  * Created by Dan on 11/23/2016.
  */
-public class GoogleSsoController extends Controller {
+public class GoogleSsoController extends BaseController {
 
     private static final String GOOGLE_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v3/tokeninfo";
 
