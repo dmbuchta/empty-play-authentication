@@ -14,6 +14,7 @@ import static org.junit.Assert.*;
 import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.fakeRequest;
 import static play.test.Helpers.route;
+import static utils.TestConstants.*;
 import static utils.TestUtils.parseResult;
 
 /**
@@ -27,9 +28,9 @@ public class CreateAccountApplicationTest extends ApplicationTest {
 
         Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.createAccount().url());
         Map<String, String> data = new HashMap<>();
-        data.put("newEmail", "tester1@playframework.com");
-        data.put("newPassword", "passwd");
-        data.put("confirmPassword", "passwd");
+        data.put("newEmail", FAKE_EMAIL_2);
+        data.put("newPassword", FAKE_PASS);
+        data.put("confirmPassword", FAKE_PASS);
         requestBuilder.bodyForm(data);
         Result result = route(requestBuilder);
 
@@ -50,9 +51,9 @@ public class CreateAccountApplicationTest extends ApplicationTest {
 
         Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.createAccount().url());
         Map<String, String> data = new HashMap<>();
-        data.put("newEmail", "testemail@playframework.com");
-        data.put("newPassword", "passwd");
-        data.put("confirmPassword", "passwd");
+        data.put("newEmail", FAKE_EMAIL);
+        data.put("newPassword", FAKE_PASS);
+        data.put("confirmPassword", FAKE_PASS);
         requestBuilder.bodyForm(data);
         Result result = route(requestBuilder);
 
@@ -73,8 +74,8 @@ public class CreateAccountApplicationTest extends ApplicationTest {
 
         Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.createAccount().url());
         Map<String, String> data = new HashMap<>();
-        data.put("newEmail", "invalidEmail");
-        data.put("newPassword", "short");
+        data.put("newEmail", INVALID_EMAIL);
+        data.put("newPassword", INVALID_PASS);
         requestBuilder.bodyForm(data);
         Result result = route(requestBuilder);
 

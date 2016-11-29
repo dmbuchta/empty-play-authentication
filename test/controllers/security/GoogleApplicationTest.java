@@ -7,20 +7,15 @@ import play.mvc.Result;
 import utils.ApplicationTest;
 import utils.Configs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static play.mvc.Http.Status.OK;
-import static play.test.Helpers.contentAsString;
-import static play.test.Helpers.fakeRequest;
-import static play.test.Helpers.route;
+import static play.test.Helpers.*;
+import static utils.TestConstants.FAKE_CLIENT_ID;
 
 /**
  * Created by Dan on 11/27/2016.
  */
 public class GoogleApplicationTest extends ApplicationTest {
-
-    private static final String FAKE_CLIENT_ID = "FAKE_CLIENT_ID";
 
     @Override
     public GuiceApplicationBuilder configureApp(GuiceApplicationBuilder builder) {

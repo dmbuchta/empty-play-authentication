@@ -24,17 +24,12 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.*;
+import static utils.TestConstants.*;
 
 /**
  * Created by Dan on 11/28/2016.
  */
 public class FacebookLoginServiceTest extends LoginServiceTest {
-
-    private static final String FAKE_APP_ID = "FAKE_APP_ID";
-    private static final String FAKE_APP_SECRET = "FAKE_APP_SECRET";
-    private static final String FAKE_APP_TOKEN = FAKE_APP_ID + "|" + FAKE_APP_SECRET;
-    private static final String FAKE_TOKEN = "FAKE_APP_SECRET";
-    private static final String FAKE_USER_ID = "FAKE_USER_ID";
 
     protected FacebookLoginService.FacebookLoginForm loginForm;
 
@@ -57,8 +52,8 @@ public class FacebookLoginServiceTest extends LoginServiceTest {
     public void setUp() {
         super.setUp();
         loginForm = new FacebookLoginService.FacebookLoginForm();
-        loginForm.setInput_token(FAKE_TOKEN);
-        loginForm.setUserID(FAKE_USER_ID);
+        loginForm.setInput_token(FAKE_INPUT_TOKEN);
+        loginForm.setUserID(FAKE_USER_ID + "");
         when(form.get()).thenReturn(loginForm);
 
         when(configuration.getString(Configs.FB_APP_ID)).thenReturn(FAKE_APP_ID);
@@ -75,7 +70,7 @@ public class FacebookLoginServiceTest extends LoginServiceTest {
         data.put("app_id", FAKE_APP_ID);
         data.put("is_valid", true);
         ObjectNode tokenJsonResponse = Json.newObject();
-        tokenJsonResponse.set("data",data);
+        tokenJsonResponse.set("data", data);
         mockTokenRequest(tokenJsonResponse);
 
         ObjectNode emailJsonResponse = Json.newObject();
@@ -96,7 +91,7 @@ public class FacebookLoginServiceTest extends LoginServiceTest {
         data.put("app_id", FAKE_APP_ID);
         data.put("is_valid", true);
         ObjectNode tokenJsonResponse = Json.newObject();
-        tokenJsonResponse.set("data",data);
+        tokenJsonResponse.set("data", data);
         mockTokenRequest(tokenJsonResponse);
 
         ObjectNode emailJsonResponse = Json.newObject();
@@ -143,7 +138,7 @@ public class FacebookLoginServiceTest extends LoginServiceTest {
         Logger.debug("Testing a login with an invalid Facebook App ID");
 
         ObjectNode data = Json.newObject();
-        data.put("app_id", FAKE_APP_ID + "INCORRECT");
+        data.put("app_id", WRONG_FAKE_APP_ID);
         data.put("is_valid", true);
         ObjectNode tokenJsonResponse = Json.newObject();
         mockTokenRequest(tokenJsonResponse);
@@ -168,10 +163,10 @@ public class FacebookLoginServiceTest extends LoginServiceTest {
         Logger.debug("Testing a login with Invalid Facebook Response (2)");
 
         ObjectNode data = Json.newObject();
-        data.put("app_id", FAKE_APP_ID + "INCORRECT");
+        data.put("app_id", FAKE_APP_ID);
         data.put("is_valid", true);
         ObjectNode tokenJsonResponse = Json.newObject();
-        tokenJsonResponse.set("data",data);
+        tokenJsonResponse.set("data", data);
         mockTokenRequest(tokenJsonResponse);
         mockEmailRequest(Json.newObject());
 
@@ -204,7 +199,7 @@ public class FacebookLoginServiceTest extends LoginServiceTest {
         ArgumentCaptor<Function> functionArgumentCaptor = ArgumentCaptor.forClass(Function.class);
 
         when(wsClient.url(eq(FacebookLoginService.FB_TOKEN_ENDPOINT))).thenReturn(wsTokenRequest);
-        when(wsTokenRequest.setQueryParameter(eq("input_token"), eq(FAKE_TOKEN))).thenReturn(wsTokenRequest);
+        when(wsTokenRequest.setQueryParameter(eq("input_token"), eq(FAKE_INPUT_TOKEN))).thenReturn(wsTokenRequest);
         when(wsTokenRequest.setQueryParameter(eq("access_token"), eq(FAKE_APP_TOKEN))).thenReturn(wsTokenRequest);
         when(wsTokenRequest.get()).thenReturn(unusedPromise1);
         when(unusedPromise1.thenApply(functionArgumentCaptor.capture())).thenReturn(wsTokenPromise);

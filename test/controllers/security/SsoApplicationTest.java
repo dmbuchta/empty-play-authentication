@@ -10,15 +10,12 @@ import utils.Configs;
 import static org.junit.Assert.*;
 import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.*;
+import static utils.TestConstants.*;
 
 /**
  * Created by Dan on 11/27/2016.
  */
 public class SsoApplicationTest extends ApplicationTest {
-
-    private static final String FAKE_CLIENT_ID = "FAKE_CLIENT_ID";
-    private static final String FAKE_APP_ID = "FAKE_APP_ID";
-    private static final String FAKE_APP_SECRET = "FAKE_APP_SECRET";
 
     @Override
     public GuiceApplicationBuilder configureApp(GuiceApplicationBuilder builder) {

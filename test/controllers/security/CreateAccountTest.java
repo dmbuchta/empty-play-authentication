@@ -17,6 +17,7 @@ import utils.TestUtils;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static play.mvc.Http.Status.OK;
+import static utils.TestConstants.FAKE_USER_ID;
 
 /**
  * Created by Dan on 11/20/2016.
@@ -91,11 +92,11 @@ public class CreateAccountTest extends LoginControllerTest {
     public void testValidAccountCreation() {
         Logger.debug("Testing creating an account");
         User user = new User();
-        user.setId(10000);
+        user.setId(FAKE_USER_ID);
 
         when(newUserForm.hasErrors()).thenReturn(false);
         when(newUserForm.get()).thenReturn(newUserInput);
-        when(session.get(eq("uId"))).thenReturn(user.getId() + "");
+        when(session.get(eq("uId"))).thenReturn(FAKE_USER_ID + "");
         try {
             when(accountService.createNewAccount(newUserInput)).thenReturn(user);
         } catch (PSQLException e) {

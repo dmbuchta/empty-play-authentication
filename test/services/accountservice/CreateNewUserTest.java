@@ -16,6 +16,8 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static utils.TestConstants.FAKE_EMAIL;
+import static utils.TestConstants.FAKE_PASS;
 
 /**
  * Created by Dan on 11/19/2016.
@@ -32,8 +34,8 @@ public class CreateNewUserTest extends UnitTest {
     public void setUp() {
         super.setUp();
         newUserForm = new AccountService.NewUserForm();
-        newUserForm.setNewEmail("testemail@playframework.com");
-        newUserForm.setNewPassword("password");
+        newUserForm.setNewEmail(FAKE_EMAIL);
+        newUserForm.setNewPassword(FAKE_PASS);
     }
 
     @Override

@@ -23,14 +23,12 @@ import java.util.function.Function;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static utils.TestConstants.*;
 
 /**
  * Created by Dan on 11/28/2016.
  */
 public class GoogleLoginServiceTest extends LoginServiceTest {
-
-    private static final String FAKE_CLIENT_ID = "THIS_IS_A_FAKE_GOOGLE_CLIENT_ID";
-    private static final String FAKE_TOKEN = "FAKE_TOKEN";
 
     protected GoogleLoginService.GoogleLoginForm loginForm;
 
@@ -47,7 +45,7 @@ public class GoogleLoginServiceTest extends LoginServiceTest {
     public void setUp() {
         super.setUp();
         loginForm = new GoogleLoginService.GoogleLoginForm();
-        loginForm.setId_token(FAKE_TOKEN);
+        loginForm.setId_token(FAKE_LOGIN_TOKEN);
         when(form.get()).thenReturn(loginForm);
 
         when(configuration.getString(Configs.GOOGLE_CLIENT_ID)).thenReturn(FAKE_CLIENT_ID);
@@ -94,7 +92,7 @@ public class GoogleLoginServiceTest extends LoginServiceTest {
         Logger.debug("Running Login Test with an invalid Client ID in the response");
 
         ObjectNode jsonResponse = Json.newObject();
-        jsonResponse.put("aud", FAKE_CLIENT_ID + "INCORRECT");
+        jsonResponse.put("aud", WRONG_FAKE_CLIENT_ID);
         jsonResponse.put("email", user.getEmail());
         setUpWSMocking(jsonResponse);
 
@@ -116,7 +114,7 @@ public class GoogleLoginServiceTest extends LoginServiceTest {
         ArgumentCaptor<Function> functionArgumentCaptor = ArgumentCaptor.forClass(Function.class);
 
         when(wsClient.url(GoogleLoginService.GOOGLE_TOKEN_ENDPOINT)).thenReturn(wsRequest);
-        when(wsRequest.setQueryParameter(eq("id_token"), eq(FAKE_TOKEN))).thenReturn(wsRequest);
+        when(wsRequest.setQueryParameter(eq("id_token"), eq(FAKE_LOGIN_TOKEN))).thenReturn(wsRequest);
         when(wsRequest.get()).thenReturn(unusedPromise);
         when(unusedPromise.thenApply(functionArgumentCaptor.capture())).thenReturn(wsResponsePromise);
         when(wsResponsePromise.thenApply(functionArgumentCaptor.capture())).thenReturn(wsResponsePromise);

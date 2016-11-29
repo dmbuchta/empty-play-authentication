@@ -11,13 +11,14 @@ import play.data.Form;
 import play.mvc.Result;
 import services.exceptions.EnfException;
 import services.login.impl.GoogleLoginService;
-import utils.TestUtils;
 
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static play.mvc.Http.Status.OK;
+import static utils.TestConstants.FAKE_USER_ID;
+import static utils.TestUtils.parseResult;
 
 /**
  * Created by Dan on 11/28/2016.
@@ -40,14 +41,14 @@ public class GoogleLoginControllerTest extends LoginControllerTest {
     public void testGoodLogin() {
         Logger.debug("Testing a valid login");
         User user = new User();
-        user.setId(100000);
+        user.setId(FAKE_USER_ID);
 
         when(loginForm.hasErrors()).thenReturn(false);
         when(loginService.login(loginForm)).thenReturn(CompletableFuture.completedFuture(user));
-        when(session.get(eq("uId"))).thenReturn(user.getId() + "");
+        when(session.get(eq("uId"))).thenReturn(FAKE_USER_ID + "");
 
         Result result = getResultFromController(controller);
-        JsonNode json = TestUtils.parseResult(result);
+        JsonNode json = parseResult(result);
         assertFalse("Result has formErrors key", json.has("formErrors"));
         assertTrue("Result does not have success key", json.has("success"));
         assertTrue("Result success key has the incorrect value", json.get("success").asBoolean());
@@ -66,7 +67,7 @@ public class GoogleLoginControllerTest extends LoginControllerTest {
         when(loginService.login(loginForm)).thenReturn(Futures.failedCompletionStage(new EnfException()));
 
         Result result = getResultFromController(controller);
-        JsonNode json = TestUtils.parseResult(result);
+        JsonNode json = parseResult(result);
         assertFalse("Result has formErrors key", json.has("formErrors"));
         assertTrue("Result does not have success key", json.has("success"));
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
@@ -85,7 +86,7 @@ public class GoogleLoginControllerTest extends LoginControllerTest {
         when(loginService.login(loginForm)).thenReturn(Futures.failedCompletionStage(new RuntimeException(GoogleLoginService.INVALID_AUD_MESSAGE)));
 
         Result result = getResultFromController(controller);
-        JsonNode json = TestUtils.parseResult(result);
+        JsonNode json = parseResult(result);
         assertFalse("Result has formErrors key", json.has("formErrors"));
         assertTrue("Result does not have success key", json.has("success"));
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
@@ -102,7 +103,7 @@ public class GoogleLoginControllerTest extends LoginControllerTest {
         when(loginForm.hasErrors()).thenReturn(true);
 
         Result result = getResultFromController(controller);
-        JsonNode json = TestUtils.parseResult(result);
+        JsonNode json = parseResult(result);
         assertTrue("Result does not have formErrors key", json.has("formErrors"));
         assertTrue("Result does not have success key", json.has("success"));
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());

@@ -11,7 +11,6 @@ import play.data.Form;
 import play.mvc.Result;
 import services.exceptions.EnfException;
 import services.login.impl.FacebookLoginService;
-import utils.TestUtils;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -19,6 +18,8 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static play.mvc.Http.Status.OK;
+import static utils.TestConstants.FAKE_EMAIL;
+import static utils.TestUtils.parseResult;
 
 /**
  * Created by Dan on 11/28/2016.
@@ -48,7 +49,7 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         when(session.get(eq("uId"))).thenReturn(user.getId() + "");
 
         Result result = getResultFromController(controller);
-        JsonNode json = TestUtils.parseResult(result);
+        JsonNode json = parseResult(result);
         assertFalse("Result has formErrors key", json.has("formErrors"));
         assertTrue("Result does not have success key", json.has("success"));
         assertTrue("Result success key has the incorrect value", json.get("success").asBoolean());
@@ -62,17 +63,18 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
     @Test
     public void testGoodLoginWithNoAccount() {
         Logger.debug("Testing a valid login with no account");
-
         when(loginForm.hasErrors()).thenReturn(false);
-        when(loginService.login(loginForm)).thenReturn(Futures.failedCompletionStage(new EnfException()));
+        when(loginService.login(loginForm)).thenReturn(Futures.failedCompletionStage(new EnfException(FAKE_EMAIL)));
 
         Result result = getResultFromController(controller);
-        JsonNode json = TestUtils.parseResult(result);
+        JsonNode json = parseResult(result);
         assertFalse("Result has formErrors key", json.has("formErrors"));
         assertTrue("Result does not have success key", json.has("success"));
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
         assertTrue("Result does not have message key", json.has("message"));
         assertEquals("Result message key has the incorrect value", json.get("message").asText(), "No account");
+        assertTrue("Result does not have email key", json.has("email"));
+        assertEquals("Result email key has the incorrect value", json.get("email").asText(), FAKE_EMAIL);
         assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);
@@ -86,7 +88,7 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         when(loginService.login(loginForm)).thenReturn(Futures.failedCompletionStage(new RuntimeException(FacebookLoginService.INVALID_TOKEN_RESPONSE)));
 
         Result result = getResultFromController(controller);
-        JsonNode json = TestUtils.parseResult(result);
+        JsonNode json = parseResult(result);
         assertFalse("Result has formErrors key", json.has("formErrors"));
         assertTrue("Result does not have success key", json.has("success"));
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
@@ -105,7 +107,7 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         when(loginService.login(loginForm)).thenReturn(Futures.failedCompletionStage(new NullPointerException("No key with value 'email'")));
 
         Result result = getResultFromController(controller);
-        JsonNode json = TestUtils.parseResult(result);
+        JsonNode json = parseResult(result);
         assertFalse("Result has formErrors key", json.has("formErrors"));
         assertTrue("Result does not have success key", json.has("success"));
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
@@ -122,7 +124,7 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         when(loginForm.hasErrors()).thenReturn(true);
 
         Result result = getResultFromController(controller);
-        JsonNode json = TestUtils.parseResult(result);
+        JsonNode json = parseResult(result);
         assertTrue("Result does not have formErrors key", json.has("formErrors"));
         assertTrue("Result does not have success key", json.has("success"));
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());

@@ -10,14 +10,13 @@ import utils.Configs;
 import static org.junit.Assert.*;
 import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.*;
+import static utils.TestConstants.FAKE_APP_ID;
+import static utils.TestConstants.FAKE_APP_SECRET;
 
 /**
  * Created by Dan on 11/27/2016.
  */
 public class FacebookApplicationTest extends ApplicationTest {
-
-    private static final String FAKE_APP_ID = "FAKE_APP_ID";
-    private static final String FAKE_APP_SECRET = "FAKE_APP_SECRET";
 
     @Override
     public GuiceApplicationBuilder configureApp(GuiceApplicationBuilder builder) {

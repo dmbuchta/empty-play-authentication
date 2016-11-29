@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 import static play.mvc.Http.Status.OK;
 import static play.mvc.Http.Status.SEE_OTHER;
 import static play.test.Helpers.*;
+import static utils.TestConstants.*;
 
 /**
  * Created by Dan on 11/19/2016.
@@ -42,8 +43,8 @@ public class LoginApplicationTest extends ApplicationTest {
 
         Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.login().url());
         Map<String, String> data = new HashMap<>();
-        data.put("email", "testemail@playframework.com");
-        data.put("password", "passwd");
+        data.put("email", FAKE_EMAIL);
+        data.put("password", FAKE_PASS);
         requestBuilder.bodyForm(data);
         Result result = route(requestBuilder);
 
@@ -57,8 +58,8 @@ public class LoginApplicationTest extends ApplicationTest {
 
         Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.login().url());
         Map<String, String> data = new HashMap<>();
-        data.put("email", "testEMAIL@playframework.com");
-        data.put("password", "passwd");
+        data.put("email", FAKE_EMAIL);
+        data.put("password", FAKE_PASS);
         requestBuilder.bodyForm(data);
         Result result = route(requestBuilder);
 
@@ -72,8 +73,8 @@ public class LoginApplicationTest extends ApplicationTest {
 
         Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.login().url());
         Map<String, String> data = new HashMap<>();
-        data.put("email", "testemail@playframework.com");
-        data.put("password", "password");
+        data.put("email", FAKE_EMAIL);
+        data.put("password", WRONG_PASS);
         requestBuilder.bodyForm(data);
         Result result = route(requestBuilder);
 
@@ -99,7 +100,7 @@ public class LoginApplicationTest extends ApplicationTest {
         assertTrue("Login page does not show required validation errors", html.contains("This field is required"));
 
         requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.login().url());
-        data.put("email", "invalidEmail");
+        data.put("email", INVALID_EMAIL);
         requestBuilder.bodyForm(data);
         result = route(requestBuilder);
         html = contentAsString(result);

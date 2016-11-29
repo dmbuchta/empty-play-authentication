@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import static play.mvc.Http.Status.SEE_OTHER;
+import static utils.TestConstants.FAKE_USER_ID;
 
 /**
  * Created by Dan on 11/28/2016.
@@ -44,10 +45,10 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
     public void testGoodLogin() {
         Logger.debug("Testing a valid login");
         User user = new User();
-        user.setId(100000);
+        user.setId(FAKE_USER_ID);
         when(loginForm.hasErrors()).thenReturn(false);
         when(loginService.login(loginForm)).thenReturn(CompletableFuture.completedFuture(user));
-        when(session.get(eq("uId"))).thenReturn(user.getId() + "");
+        when(session.get(eq("uId"))).thenReturn(FAKE_USER_ID + "");
 
         Result result = getResultFromController(controller);
         assertEquals("Did not redirect after logging in", result.status(), SEE_OTHER);
