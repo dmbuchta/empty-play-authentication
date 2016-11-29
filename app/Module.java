@@ -1,16 +1,22 @@
 import com.google.inject.AbstractModule;
-import java.time.Clock;
-
+import com.google.inject.name.Names;
 import play.http.DefaultHttpErrorHandler;
 import repositories.UserRepository;
-import repositories.impl.JPAUserRepository;
+import repositories.impl.JpaUserRepository;
+import repositories.impl.UnboundJpaUserRepo;
 import services.ApplicationTimer;
+import services.login.LoginService;
+import services.login.impl.FacebookLoginService;
+import services.login.impl.GoogleLoginService;
+import services.login.impl.SimpleLoginService;
+
+import java.time.Clock;
 
 /**
  * This class is a Guice module that tells Guice how to bind several
  * different types. This Guice module is created when the Play
  * application starts.
- *
+ * <p>
  * Play will automatically use any class called `Module` that is in
  * the root package. You can create modules in other locations by
  * adding `play.modules.enabled` settings to the `application.conf`
@@ -25,8 +31,14 @@ public class Module extends AbstractModule {
         // Ask Guice to create an instance of ApplicationTimer when the
         // application starts.
         bind(ApplicationTimer.class).asEagerSingleton();
-        bind(UserRepository.class).to(JPAUserRepository.class);
         bind(DefaultHttpErrorHandler.class).to(ErrorHandler.class);
+
+        bind(UserRepository.class).to(JpaUserRepository.class);
+        bind(UserRepository.class).annotatedWith(Names.named("unbound")).to(UnboundJpaUserRepo.class);
+
+        bind(LoginService.class).to(SimpleLoginService.class);
+        bind(LoginService.class).annotatedWith(Names.named("google")).to(GoogleLoginService.class);
+        bind(LoginService.class).annotatedWith(Names.named("facebook")).to(FacebookLoginService.class);
     }
 
 }

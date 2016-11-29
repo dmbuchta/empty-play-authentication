@@ -1,61 +1,61 @@
 package controllers.security;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode;
 import models.User;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.postgresql.util.PSQLException;
+import play.Configuration;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Result;
+import services.AccountService;
 import services.exceptions.DuplicateEntityException;
+import utils.TestUtils;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static play.mvc.Http.Status.OK;
-import static utils.TestUtils.parseResult;
 
 /**
  * Created by Dan on 11/20/2016.
  */
-public class CreateAccountTest extends SecurityControllerTest {
+public class CreateAccountTest extends LoginControllerTest {
+    @Mock
+    private AccountService.NewUserForm newUserInput;
+    @Mock
+    protected Form<AccountService.NewUserForm> newUserForm;
+    @Mock
+    private AccountService accountService;
+    @Mock
+    private Configuration configuration;
 
-    @Mock
-    private SecurityController.NewUserForm newUserInput;
-    @Mock
-    protected Form<SecurityController.NewUserForm> newUserForm;
+    @InjectMocks
+    private SimpleLoginController controller;
 
     @Override
     public void setUp() {
         super.setUp();
-        when(formFactory.form(SecurityController.NewUserForm.class)).thenReturn(newUserForm);
+        when(formFactory.form(AccountService.NewUserForm.class)).thenReturn(newUserForm);
         when(newUserForm.bindFromRequest()).thenReturn(newUserForm);
-    }
-
-    @Override
-    public void tearDown() {
-        super.tearDown();
+        when(newUserForm.get()).thenReturn(newUserInput);
     }
 
     @Test
     public void testAccountCreationWithErrors() {
         Logger.debug("Testing creating an account with form errors");
         when(newUserForm.hasErrors()).thenReturn(true);
-        Result result = controller.createAccount();
 
-        assertEquals("Status did not return OK", OK, result.status());
-        assertTrue("Response was not json", result.contentType().toString().contains("application/json"));
-
-        ObjectNode json = parseResult(result);
+        Result result = getResultFromController(controller);
+        JsonNode json = TestUtils.parseResult(result);
         assertTrue("Response does not have formErrors", json.has("formErrors"));
         assertTrue("Response does not have the success key", json.has("success"));
         assertFalse("Response does not have correct success value", json.get("success").asBoolean());
 
-        ArgumentCaptor<SecurityController.NewUserForm> argument = ArgumentCaptor.forClass(SecurityController.NewUserForm.class);
         try {
             verify(newUserForm, times(2)).hasErrors();
-            verify(userService, never()).createNewUser(argument.capture());
+            verify(accountService, never()).createNewAccount(newUserInput);
         } catch (PSQLException e) {
             fail("This should never happen (2)");
         }
@@ -65,18 +65,15 @@ public class CreateAccountTest extends SecurityControllerTest {
     public void testExistingAccountCreation() {
         Logger.debug("Testing creating an account that already exists");
         when(newUserForm.hasErrors()).thenReturn(false);
-        when(newUserForm.get()).thenReturn(newUserInput);
         try {
-            when(userService.createNewUser(newUserInput)).thenThrow(new DuplicateEntityException());
+            when(accountService.createNewAccount(newUserInput)).thenThrow(new DuplicateEntityException());
         } catch (PSQLException e) {
             fail("This should never happen (1)");
         }
 
-        Result result = controller.createAccount();
-        assertEquals("Status did not return OK", OK, result.status());
-        assertTrue("Response was not json", result.contentType().toString().contains("application/json"));
+        Result result = getResultFromController(controller);
 
-        ObjectNode json = parseResult(result);
+        JsonNode json = TestUtils.parseResult(result);
         assertFalse("Response has formErrors when it shouldn't", json.has("formErrors"));
         assertTrue("Response does not have an error message", json.has("message"));
         assertEquals("The Response error message is incorrect", "There is already an account with this email address.", json.get("message").asText());
@@ -84,7 +81,7 @@ public class CreateAccountTest extends SecurityControllerTest {
         assertFalse("Response does not have correct success value", json.get("success").asBoolean());
 
         try {
-            verify(userService).createNewUser(newUserInput);
+            verify(accountService).createNewAccount(newUserInput);
         } catch (PSQLException e) {
             fail("This should never happen (2)");
         }
@@ -98,28 +95,35 @@ public class CreateAccountTest extends SecurityControllerTest {
 
         when(newUserForm.hasErrors()).thenReturn(false);
         when(newUserForm.get()).thenReturn(newUserInput);
+        when(session.get(eq("uId"))).thenReturn(user.getId() + "");
         try {
-            when(userService.createNewUser(newUserInput)).thenReturn(user);
+            when(accountService.createNewAccount(newUserInput)).thenReturn(user);
         } catch (PSQLException e) {
             fail("This should never happen (1)");
         }
 
-        Result result = controller.createAccount();
-        assertEquals("Status did not return OK", OK, result.status());
-        assertTrue("Response was not json", result.contentType().toString().contains("application/json"));
-
-        ObjectNode json = parseResult(result);
+        Result result = getResultFromController(controller);
+        JsonNode json = TestUtils.parseResult(result);
         assertFalse("Response has formErrors when it shouldn't", json.has("formErrors"));
         assertFalse("Response has an error message", json.has("message"));
         assertTrue("Response does not have the success key", json.has("success"));
         assertTrue("Response does not have correct success value", json.get("success").asBoolean());
         assertTrue("Response does not have the url key", json.has("url"));
         assertEquals("Response does not have correct url value", controllers.secured.routes.HomeController.index().url(), json.get("url").asText());
+        assertTrue("User is not being stored on session", Authenticator.isUserLoggedIn(context));
 
         try {
-            verify(userService).createNewUser(newUserInput);
+            verify(accountService).createNewAccount(newUserInput);
         } catch (PSQLException e) {
             fail("This should never happen (2)");
         }
+    }
+
+    @Override
+    protected Result getResultFromController(LoginController controller) {
+        Result result = ((SimpleLoginController) controller).createAccount();
+        assertTrue("Result type is not json", result.contentType().toString().contains("application/json"));
+        assertEquals("Result status is not OK", result.status(), OK);
+        return result;
     }
 }

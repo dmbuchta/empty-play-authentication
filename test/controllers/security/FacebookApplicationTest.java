@@ -1,4 +1,4 @@
-package controllers.security.sso;
+package controllers.security;
 
 import org.junit.Test;
 import play.Logger;
@@ -30,7 +30,7 @@ public class FacebookApplicationTest extends ApplicationTest {
     public void testShowLoginPage() {
         Logger.debug("Testing the login page with Facebook Sign in configured");
 
-        Result result = route(fakeRequest("GET", controllers.security.routes.SecurityController.showLoginPage().url()));
+        Result result = route(fakeRequest("GET", controllers.security.routes.SimpleLoginController.showLoginPage().url()));
 
         assertEquals("Status is not OK", OK, result.status());
         assertTrue("Result is not text/html", result.contentType().toString().contains("text/html"));

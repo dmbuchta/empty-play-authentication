@@ -23,7 +23,7 @@ public class LoginApplicationTest extends ApplicationTest {
     public void testShowLoginPage() {
         Logger.debug("Testing the login page");
 
-        Result result = route(fakeRequest("GET", controllers.security.routes.SecurityController.showLoginPage().url()));
+        Result result = route(fakeRequest("GET", controllers.security.routes.SimpleLoginController.showLoginPage().url()));
 
         assertEquals("Status is not OK", OK, result.status());
         assertTrue("Result is not text/html", result.contentType().toString().contains("text/html"));
@@ -40,7 +40,7 @@ public class LoginApplicationTest extends ApplicationTest {
     public void testLoginSuccessfully() {
         Logger.debug("Testing a successful login");
 
-        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SecurityController.login().url());
+        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.login().url());
         Map<String, String> data = new HashMap<>();
         data.put("email", "testemail@playframework.com");
         data.put("password", "passwd");
@@ -55,7 +55,7 @@ public class LoginApplicationTest extends ApplicationTest {
     public void testEmailIsCaseInsensitive() {
         Logger.debug("Testing a successful login");
 
-        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SecurityController.login().url());
+        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.login().url());
         Map<String, String> data = new HashMap<>();
         data.put("email", "testEMAIL@playframework.com");
         data.put("password", "passwd");
@@ -70,7 +70,7 @@ public class LoginApplicationTest extends ApplicationTest {
     public void testLoginUnsuccessfully() {
         Logger.debug("Testing an unsuccessful login");
 
-        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SecurityController.login().url());
+        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.login().url());
         Map<String, String> data = new HashMap<>();
         data.put("email", "testemail@playframework.com");
         data.put("password", "password");
@@ -90,7 +90,7 @@ public class LoginApplicationTest extends ApplicationTest {
     public void testServerSideValidation() {
         Logger.debug("Testing server side validation");
 
-        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SecurityController.login().url());
+        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.login().url());
         Map<String, String> data = new HashMap<>();
         requestBuilder.bodyForm(data);
         Result result = route(requestBuilder);
@@ -98,7 +98,7 @@ public class LoginApplicationTest extends ApplicationTest {
         String html = contentAsString(result);
         assertTrue("Login page does not show required validation errors", html.contains("This field is required"));
 
-        requestBuilder = fakeRequest("POST", controllers.security.routes.SecurityController.login().url());
+        requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.login().url());
         data.put("email", "invalidEmail");
         requestBuilder.bodyForm(data);
         result = route(requestBuilder);
@@ -110,7 +110,7 @@ public class LoginApplicationTest extends ApplicationTest {
     public void testUnconfiguredGoogleLogin() {
         Logger.debug("Testing an un-configured Google login");
 
-        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.sso.routes.GoogleSsoController.login().url());
+        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.GoogleLoginController.login().url());
         Result result = route(requestBuilder);
 
         assertEquals("Status is not a 501", NOT_IMPLEMENTED, result.status());
@@ -119,7 +119,7 @@ public class LoginApplicationTest extends ApplicationTest {
     @Test
     public void testUnconfiguredFacebookLogin() {
         Logger.debug("Testing an un-configured Facebook login");
-        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.sso.routes.FacebookSsoController.login().url());
+        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.FacebookLoginController.login().url());
         Result result = route(requestBuilder);
         assertEquals("Status is not a 501", NOT_IMPLEMENTED, result.status());
     }

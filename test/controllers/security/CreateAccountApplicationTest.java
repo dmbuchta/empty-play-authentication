@@ -25,7 +25,7 @@ public class CreateAccountApplicationTest extends ApplicationTest {
     public void testCreateAccountSuccessfully() {
         Logger.debug("Testing a successful account creation");
 
-        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SecurityController.createAccount().url());
+        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.createAccount().url());
         Map<String, String> data = new HashMap<>();
         data.put("newEmail", "tester1@playframework.com");
         data.put("newPassword", "passwd");
@@ -48,7 +48,7 @@ public class CreateAccountApplicationTest extends ApplicationTest {
     public void testDuplicateUserCreation() {
         Logger.debug("Testing a duplicate account creation");
 
-        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SecurityController.createAccount().url());
+        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.createAccount().url());
         Map<String, String> data = new HashMap<>();
         data.put("newEmail", "testemail@playframework.com");
         data.put("newPassword", "passwd");
@@ -71,7 +71,7 @@ public class CreateAccountApplicationTest extends ApplicationTest {
     public void testServerSideValidation() {
         Logger.debug("Testing server side validation");
 
-        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SecurityController.createAccount().url());
+        Http.RequestBuilder requestBuilder = fakeRequest("POST", controllers.security.routes.SimpleLoginController.createAccount().url());
         Map<String, String> data = new HashMap<>();
         data.put("newEmail", "invalidEmail");
         data.put("newPassword", "short");

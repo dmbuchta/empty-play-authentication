@@ -1,7 +1,6 @@
 package utils;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.lang3.StringUtils;
 import org.postgresql.util.PSQLException;
 import play.Logger;
 import play.data.Form;
@@ -57,6 +56,17 @@ public class Utils {
         Logger.debug("Body {}", response.getBody());
         Logger.debug("URI {}", response.getUri());
         return response;
+    }
+
+    public static String encryptString(String value) {
+        try {
+            byte[] hash = MessageDigest.getInstance("SHA-512").digest(value.getBytes("UTF-8"));
+            // Must parse out the null character 0x0
+            // Reference: https://www.postgresql.org/message-id/1171970019.3101.328.camel%40coppola.muc.ecircle.de
+            return new String(hash, "UTF-8").replace("\u0000", "");
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Empty block for immediate code testing

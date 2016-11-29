@@ -11,12 +11,12 @@ import javax.persistence.NoResultException;
 /**
  * Created by Dan on 11/19/2016.
  */
-public class JPAUserRepository implements UserRepository {
+public class JpaUserRepository implements UserRepository {
 
-    private final JPAApi jpaApi;
+    protected final JPAApi jpaApi;
 
     @Inject
-    public JPAUserRepository(JPAApi jpaApi) {
+    public JpaUserRepository(JPAApi jpaApi) {
         this.jpaApi = jpaApi;
     }
 

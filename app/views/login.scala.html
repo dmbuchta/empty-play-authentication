@@ -1,5 +1,5 @@
 @import b4.vertical.fieldConstructor
-@import controllers.security.SecurityController.NewUserForm
+@import services.AccountService.NewUserForm
 @import org.apache.commons.lang3.StringUtils
 @(loginForm: Form[models.User], newUserForm: Form[NewUserForm], ssoClientId: String = null, fbAppId: String = null)
 @main("Login") {
@@ -73,7 +73,7 @@
                 </div>
             }
             </div>
-            @b4.form(security.routes.SecurityController.login(), 'id -> "login-form", Symbol("data-toggle") -> "validator") {
+            @b4.form(security.routes.SimpleLoginController.login(), 'id -> "login-form", Symbol("data-toggle") -> "validator") {
                 @b4.inputWrapped("email", loginForm("email"), 'placeholder -> "Email Address", '_class -> "has-feedback") { input =>
                     <div class="input-group">
                         <div class="input-group-addon"><i class="fa fa-user"></i></div>
@@ -102,7 +102,7 @@
     @modal("Create Account", "sign-up-modal")("Sign Up") {
         <div class="row">
             <div class="col-xs-8 offset-xs-2">
-            @b4.form(action = security.routes.SecurityController.createAccount(), 'id -> "sign-up-form", Symbol("data-toggle") -> "validator") {
+            @b4.form(action = security.routes.SimpleLoginController.createAccount, 'id -> "sign-up-form", Symbol("data-toggle") -> "validator") {
                 @b4.inputWrapped("email", newUserForm("newEmail"), '_label -> "Email Address",
                     'placeholder -> "Email", '_class -> "has-feedback") { input =>
                     @input
@@ -139,7 +139,7 @@
                 function attachSignin(element) {
                     auth2.attachClickHandler(element, {},
                             function (googleUser) {
-                                $.ajax("@security.sso.routes.GoogleSsoController.login()", {
+                                $.ajax("@security.routes.GoogleLoginController.login()", {
                                     type: "POST",
                                     data: {
                                         id_token: googleUser.getAuthResponse().id_token
@@ -194,7 +194,7 @@
                 function fbLogin() {
                     FB.login(function (fbResponse) {
                         if (fbResponse.status == "connected") {
-                            $.ajax("@security.sso.routes.FacebookSsoController.login()", {
+                            $.ajax("@security.routes.FacebookLoginController.login()", {
                                 type: "POST",
                                 data: {
                                     input_token: fbResponse.authResponse.accessToken,

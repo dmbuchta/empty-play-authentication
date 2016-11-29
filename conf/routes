@@ -5,12 +5,11 @@
 # An example controller showing a sample home page
 GET         /                     controllers.secured.HomeController.index
 
-
-GET         /login                controllers.security.SecurityController.showLoginPage
-POST        /login                controllers.security.SecurityController.login
-POST        /login/google         controllers.security.sso.GoogleSsoController.login
-POST        /login/fb             controllers.security.sso.FacebookSsoController.login
-GET         /logout               controllers.security.SecurityController.logout
-POST        /createAccount        controllers.security.SecurityController.createAccount
+GET         /login                controllers.security.SimpleLoginController.showLoginPage
+POST        /login                controllers.security.SimpleLoginController.login
+POST        /login/google         controllers.security.GoogleLoginController.login
+POST        /login/fb             controllers.security.FacebookLoginController.login
+GET         /logout               controllers.security.SimpleLoginController.logout
+POST        /createAccount        controllers.security.SimpleLoginController.createAccount
 
 GET         /assets/*file         controllers.Assets.at(path="/public", file)

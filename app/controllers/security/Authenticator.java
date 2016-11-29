@@ -20,7 +20,7 @@ public class Authenticator extends Security.Authenticator {
 
     @Override
     public Result onUnauthorized(Http.Context ctx) {
-        return redirect(routes.SecurityController.login());
+        return redirect(routes.SimpleLoginController.login());
     }
 
     public static void setUser(Http.Context ctx, User user) {
