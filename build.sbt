@@ -41,7 +41,10 @@ libraryDependencies += "dom4j" % "dom4j" % "1.6"
 libraryDependencies += "org.hibernate" % "hibernate-core" % "5.2.3.Final" exclude("dom4j", "dom4j") exclude("javax.transaction", "jta") exclude("org.slf4j", "slf4j-api")
 
 // https://mvnrepository.com/artifact/org.postgresql/postgresql
-libraryDependencies += "org.postgresql" % "postgresql" % "9.4-1206-jdbc42"
+//libraryDependencies += "org.postgresql" % "postgresql" % "9.4-1206-jdbc42"
+libraryDependencies += "org.postgresql" % "postgresql" % "9.4.1212"
+//libraryDependencies += "org.postgresql" % "postgresql" % "9.4.1212.jre7"
+
 
 LessKeys.compress := true
 // This is a required fix for JPA/play bug in prod

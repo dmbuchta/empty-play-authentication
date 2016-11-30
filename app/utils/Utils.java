@@ -8,9 +8,12 @@ import play.libs.Json;
 import play.libs.ws.WSResponse;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.sql.SQLException;
+import java.util.UUID;
 
 /**
  * Created by Dan on 11/6/2016.
@@ -71,13 +74,29 @@ public class Utils {
 
     // Empty block for immediate code testing
     public static void main(String... args) {
+        SecureRandom secureRandom = new SecureRandom();
+        String token = new BigInteger(130*10, secureRandom).toString(32);
+        System.out.println(token);
+        System.out.println(token.length());
 
-        String value = "testemail@playframework.compassword";
-        try {
-            byte[] hash = MessageDigest.getInstance("SHA-512").digest(value.getBytes("UTF-8"));
-            System.out.println(new String(hash, "UTF-8").replace("\u0000", ""));
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        token = new BigInteger(640, secureRandom).toString(32);
+        System.out.println(token);
+        System.out.println(token.length());
+
+        token = new BigInteger(640, secureRandom).toString(32);
+        System.out.println(token);
+        System.out.println(token.length());
+
+        token = new BigInteger(640, secureRandom).toString(32);
+        System.out.println(token);
+        System.out.println(token.length());
+
+        token = new BigInteger(640, secureRandom).toString(32);
+        System.out.println(token);
+        System.out.println(token.length());
+
+        token = new BigInteger(640, secureRandom).toString(32);
+        System.out.println(token);
+        System.out.println(token.length());
     }
 }

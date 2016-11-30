@@ -110,7 +110,7 @@ public class CreateAccountTest extends LoginControllerTest {
         assertTrue("Response does not have the success key", json.has("success"));
         assertTrue("Response does not have correct success value", json.get("success").asBoolean());
         assertTrue("Response does not have the url key", json.has("url"));
-        assertEquals("Response does not have correct url value", controllers.secured.routes.HomeController.index().url(), json.get("url").asText());
+        assertEquals("Response does not have correct url value", controllers.secured.html.routes.UserController.index().url(), json.get("url").asText());
         assertTrue("User is not being stored on session", Authenticator.isUserLoggedIn(context));
 
         try {

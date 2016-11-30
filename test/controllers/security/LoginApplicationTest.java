@@ -49,7 +49,7 @@ public class LoginApplicationTest extends ApplicationTest {
         Result result = route(requestBuilder);
 
         assertEquals("Status is not a redirect", SEE_OTHER, result.status());
-        assertEquals("Login did not redirect to home page", controllers.secured.routes.HomeController.index().url(), result.redirectLocation().get());
+        assertEquals("Login did not redirect to home page", controllers.secured.html.routes.UserController.index().url(), result.redirectLocation().get());
     }
 
     @Test
@@ -64,7 +64,7 @@ public class LoginApplicationTest extends ApplicationTest {
         Result result = route(requestBuilder);
 
         assertEquals("Status is not a redirect", SEE_OTHER, result.status());
-        assertEquals("Login did not redirect to home page", controllers.secured.routes.HomeController.index().url(), result.redirectLocation().get());
+        assertEquals("Login did not redirect to home page", controllers.secured.html.routes.UserController.index().url(), result.redirectLocation().get());
     }
 
     @Test

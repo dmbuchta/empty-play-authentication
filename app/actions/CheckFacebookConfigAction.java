@@ -34,8 +34,11 @@ public class CheckFacebookConfigAction extends Action.Simple {
         appId = configuration.getString(Configs.FB_APP_ID);
         String appSecret = configuration.getString(Configs.FB_APP_SECRET);
         if (!StringUtils.isBlank(appId) && !StringUtils.isBlank(appSecret)) {
-            Logger.debug("Everything looks valid... Building Access Token.");
+            Logger.debug("Everything looks valid... Building FB Access Token.");
             accessToken = appId + "|" + appSecret;
+        }
+        else {
+            Logger.debug("Facebook Sign in is not configured.");
         }
     }
 

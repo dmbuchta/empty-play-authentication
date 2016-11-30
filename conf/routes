@@ -3,13 +3,19 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET         /                     controllers.secured.HomeController.index
+GET         /                        controllers.secured.html.UserController.index
+GET         /api                     controllers.secured.api.UserApiController.index
 
-GET         /login                controllers.security.SimpleLoginController.showLoginPage
-POST        /login                controllers.security.SimpleLoginController.login
-POST        /login/google         controllers.security.GoogleLoginController.login
-POST        /login/fb             controllers.security.FacebookLoginController.login
-GET         /logout               controllers.security.SimpleLoginController.logout
-POST        /createAccount        controllers.security.SimpleLoginController.createAccount
+GET         /login                   controllers.security.SimpleLoginController.showLoginPage
+POST        /login                   controllers.security.SimpleLoginController.login
+POST        /login/google            controllers.security.GoogleLoginController.login
+POST        /login/fb                controllers.security.FacebookLoginController.login
+GET         /logout                  controllers.security.SimpleLoginController.logout
+POST        /createAccount           controllers.security.SimpleLoginController.createAccount
 
-GET         /assets/*file         controllers.Assets.at(path="/public", file)
+POST        /api/login               controllers.security.SimpleLoginController.apiLogin
+POST        /api/login/google        controllers.security.GoogleLoginController.apiLogin
+POST        /api/login/fb            controllers.security.FacebookLoginController.apiLogin
+POST        /api/token               controllers.security.SimpleLoginController.refreshToken
+
+GET         /assets/*file            controllers.Assets.at(path="/public", file)

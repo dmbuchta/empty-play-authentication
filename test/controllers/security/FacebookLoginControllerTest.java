@@ -54,7 +54,7 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         assertTrue("Result does not have success key", json.has("success"));
         assertTrue("Result success key has the incorrect value", json.get("success").asBoolean());
         assertTrue("Response does not have the url key", json.has("url"));
-        assertEquals("Response does not have correct url value", controllers.secured.routes.HomeController.index().url(), json.get("url").asText());
+        assertEquals("Response does not have correct url value", controllers.secured.html.routes.UserController.index().url(), json.get("url").asText());
         assertTrue("User is not being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);

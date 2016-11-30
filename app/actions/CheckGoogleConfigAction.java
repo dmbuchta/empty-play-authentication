@@ -29,6 +29,11 @@ public class CheckGoogleConfigAction extends Action.Simple {
         super();
         Logger.debug("Looking up Google configuration");
         clientId = configuration.getString(Configs.GOOGLE_CLIENT_ID);
+        if (StringUtils.isBlank(clientId)) {
+            Logger.debug("Google Sign in is not configured.");
+        } else {
+            Logger.debug("Everything checks out.");
+        }
     }
 
     @Override

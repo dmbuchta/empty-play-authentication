@@ -35,6 +35,8 @@ public class User {
 
     @Constraints.MinLength(6)
     @Constraints.MaxLength(255)
+    @Constraints.Required
+    @NotEmpty
     @Transient
     @JsonIgnore
     private String password;

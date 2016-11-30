@@ -52,7 +52,7 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
 
         Result result = getResultFromController(controller);
         assertEquals("Did not redirect after logging in", result.status(), SEE_OTHER);
-        assertEquals("Did not redirect to home page", controllers.secured.routes.HomeController.index().url(), result.redirectLocation().get());
+        assertEquals("Did not redirect to home page", controllers.secured.html.routes.UserController.index().url(), result.redirectLocation().get());
         assertTrue("User is not being stored on session", Authenticator.isUserLoggedIn(context));
         verify(loginService).login(loginForm);
     }
