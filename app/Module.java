@@ -10,15 +10,12 @@ import repositories.impl.JpaTokenRepository;
 import repositories.impl.JpaUserRepository;
 import repositories.impl.UnboundJpaUserRepo;
 import services.AccessTokenCache;
-import services.ApplicationTimer;
 import services.login.LoginService;
 import services.login.impl.FacebookLoginService;
 import services.login.impl.GoogleLoginService;
 import services.login.impl.SimpleLoginService;
 import services.oauth.TokenService;
 import services.oauth.impl.SimpleTokenService;
-
-import java.time.Clock;
 
 /**
  * This class is a Guice module that tells Guice how to bind several
@@ -34,11 +31,6 @@ public class Module extends AbstractModule {
 
     @Override
     public void configure() {
-        // Use the system clock as the default implementation of Clock
-        bind(Clock.class).toInstance(Clock.systemDefaultZone());
-        // Ask Guice to create an instance of ApplicationTimer when the
-        // application starts.
-        bind(ApplicationTimer.class).asEagerSingleton();
         bind(CheckGoogleConfigAction.class).asEagerSingleton();
         bind(CheckFacebookConfigAction.class).asEagerSingleton();
         bind(CheckApiClientAction.class).asEagerSingleton();

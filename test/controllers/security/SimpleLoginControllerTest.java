@@ -1,5 +1,8 @@
 package controllers.security;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import models.RefreshToken;
 import models.User;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -14,10 +17,12 @@ import services.exceptions.EnfException;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import static play.mvc.Http.Status.SEE_OTHER;
-import static utils.TestConstants.FAKE_USER_ID;
+import static utils.TestConstants.*;
+import static utils.TestUtils.parseResult;
 
 /**
  * Created by Dan on 11/28/2016.
@@ -30,6 +35,7 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
     private AccountService accountService;
     @Mock
     private Configuration configuration;
+
 
     @InjectMocks
     private SimpleLoginController controller;
@@ -82,6 +88,62 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
             assertTrue("Looks like a npe occurred for the wrong reasons", npe.getStackTrace()[0].toString().contains("template.scala"));
             Logger.warn("Template cannot be rendered because the form is mocked", npe);
         }
+        verify(loginService, never()).login(loginForm);
+    }
+
+    @Test
+    public void testGoodApiLogin() {
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setAccessToken(FAKE_ACCESS_TOKEN);
+        refreshToken.setToken(FAKE_REFRESH_TOKEN);
+
+        User user = new User();
+        user.setId(FAKE_USER_ID);
+
+        when(loginForm.hasErrors()).thenReturn(false);
+        when(loginService.login(loginForm)).thenReturn(CompletableFuture.completedFuture(user));
+        when(tokenService.createRefreshToken(eq(user), eq(FAKE_CLIENT_ID))).thenReturn(refreshToken);
+
+        ObjectNode json = parseResult(getApiResultFromController(controller));
+        assertTrue("No success key", json.has("success"));
+        assertTrue("Incorrect success key value", json.get("success").asBoolean());
+        assertTrue("No id key", json.has("id"));
+        assertTrue("Incorrect id key value", json.get("id").asLong() == FAKE_USER_ID);
+        assertTrue("No REFRESH_TOKEN key", json.has(ApiAuthenticator.REFRESH_TOKEN));
+        assertEquals("Incorrect REFRESH_TOKEN key value", json.get(ApiAuthenticator.REFRESH_TOKEN).asText(), refreshToken.getToken());
+        assertTrue("No ACCESS_TOKEN key", json.has(ApiAuthenticator.ACCESS_TOKEN));
+        assertEquals("Incorrect ACCESS_TOKEN key value", json.get(ApiAuthenticator.ACCESS_TOKEN).asText(), refreshToken.getAccessToken());
+
+        verify(loginService).login(loginForm);
+        verify(tokenService).createRefreshToken(eq(user), eq(FAKE_CLIENT_ID));
+    }
+
+    @Test
+    public void testBadApiLogin() {
+        when(loginForm.hasErrors()).thenReturn(false);
+        when(loginService.login(loginForm)).thenThrow(new EnfException());
+
+        ObjectNode json = parseResult(getApiResultFromController(controller));
+
+        assertFalse("Result has formErrors key", json.has("formErrors"));
+        assertTrue("Result does not have success key", json.has("success"));
+        assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
+        assertTrue("Result does not have message key", json.has("message"));
+        assertEquals("Result message key has the incorrect value", json.get("message").asText(), "There was a problem with your login");
+        assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
+
+        verify(loginService).login(loginForm);
+    }
+
+    @Test
+    public void testApiLoginWithFormErrors() {
+        when(loginForm.hasErrors()).thenReturn(true);
+
+        ObjectNode json = parseResult(getApiResultFromController(controller));
+        assertTrue("Result does not have formErrors key", json.has("formErrors"));
+        assertTrue("Result does not have success key", json.has("success"));
+        assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
+
         verify(loginService, never()).login(loginForm);
     }
 }

@@ -33,5 +33,8 @@ public class TestConstants {
     public static final String FAKE_LOGIN_TOKEN = "FAKE_LOGIN_TOKEN";
     public static final String WRONG_FAKE_CLIENT_ID = FAKE_CLIENT_ID + "_INCORRECT";
 
+    public static final String FAKE_ACCESS_TOKEN = "FAKE_ACCESS_TOKEN";
+    public static final String FAKE_REFRESH_TOKEN = "FAKE_REFRESH_TOKEN";
+
 
 }
