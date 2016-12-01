@@ -1,6 +1,5 @@
 package controllers.security;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.RefreshToken;
 import models.User;
@@ -13,12 +12,11 @@ import play.data.Form;
 import play.mvc.Result;
 import services.AccountService;
 import services.exceptions.EnfException;
+import services.exceptions.InvalidTokenException;
 
 import java.util.concurrent.CompletableFuture;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static play.mvc.Http.Status.SEE_OTHER;
 import static utils.TestConstants.*;
@@ -32,6 +30,8 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
     @Mock
     private Form<User> loginForm;
     @Mock
+    private Form<SimpleLoginController.RefreshTokenForm> tokenForm;
+    @Mock
     private AccountService accountService;
     @Mock
     private Configuration configuration;
@@ -44,7 +44,9 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
     public void setUp() {
         super.setUp();
         when(formFactory.form(User.class)).thenReturn(loginForm);
+        when(formFactory.form(SimpleLoginController.RefreshTokenForm.class)).thenReturn(tokenForm);
         when(loginForm.bindFromRequest()).thenReturn(loginForm);
+        when(tokenForm.bindFromRequest()).thenReturn(tokenForm);
     }
 
     @Test
@@ -145,5 +147,88 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
 
         verify(loginService, never()).login(loginForm);
+    }
+
+    @Test
+    public void testTokenRefreshWithFormErrors() {
+        when(tokenForm.hasErrors()).thenReturn(true);
+
+        ObjectNode json = parseResult(controller.refreshToken());
+        assertTrue("Result does not have formErrors key", json.has("formErrors"));
+        assertTrue("Result does not have success key", json.has("success"));
+        assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
+
+        verify(loginService, never()).login(loginForm);
+    }
+
+    @Test
+    public void testTokenRefreshWithValidToken() {
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setAccessToken(FAKE_ACCESS_TOKEN_2);
+        refreshToken.setToken(FAKE_REFRESH_TOKEN_2);
+
+        SimpleLoginController.RefreshTokenForm tokenFormInput = new SimpleLoginController.RefreshTokenForm();
+        tokenFormInput.setRefreshToken(FAKE_REFRESH_TOKEN);
+
+        when(tokenForm.hasErrors()).thenReturn(false);
+        when(tokenForm.get()).thenReturn(tokenFormInput);
+        try {
+            when(tokenService.updateRefreshToken(eq(FAKE_REFRESH_TOKEN), eq(FAKE_CLIENT_ID))).thenReturn(refreshToken);
+        } catch (InvalidTokenException e) {
+            e.printStackTrace();
+            fail("An exception should not be thrown");
+        }
+
+        ObjectNode json = parseResult(controller.refreshToken());
+        assertTrue("No success key", json.has("success"));
+        assertTrue("Incorrect success key value", json.get("success").asBoolean());
+        assertFalse("No id key", json.has("id"));
+        assertTrue("No REFRESH_TOKEN key", json.has(ApiAuthenticator.REFRESH_TOKEN));
+        assertEquals("Incorrect REFRESH_TOKEN key value", refreshToken.getToken(), json.get(ApiAuthenticator.REFRESH_TOKEN).asText());
+        assertTrue("No ACCESS_TOKEN key", json.has(ApiAuthenticator.ACCESS_TOKEN));
+        assertEquals("Incorrect ACCESS_TOKEN key value", refreshToken.getAccessToken(), json.get(ApiAuthenticator.ACCESS_TOKEN).asText());
+
+        try {
+            verify(tokenService).updateRefreshToken(eq(FAKE_REFRESH_TOKEN), eq(FAKE_CLIENT_ID));
+        } catch (InvalidTokenException e) {
+            e.printStackTrace();
+            fail("An exception should not be thrown");
+        }
+    }
+
+    @Test
+    public void testTokenRefreshWithInvalidToken() {
+        SimpleLoginController.RefreshTokenForm tokenFormInput = new SimpleLoginController.RefreshTokenForm();
+        tokenFormInput.setRefreshToken(FAKE_REFRESH_TOKEN);
+
+        when(tokenForm.hasErrors()).thenReturn(false);
+        when(tokenForm.get()).thenReturn(tokenFormInput);
+        try {
+            when(tokenService.updateRefreshToken(eq(FAKE_REFRESH_TOKEN), eq(FAKE_CLIENT_ID))).thenThrow(new InvalidTokenException(""));
+        } catch (InvalidTokenException e) {
+            e.printStackTrace();
+            fail("An exception should not be thrown");
+        }
+
+        ObjectNode json = parseResult(controller.refreshToken());
+        assertFalse("Result has formErrors key", json.has("formErrors"));
+        assertTrue("Result does not have success key", json.has("success"));
+        assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
+        assertTrue("Result does not have message key", json.has("message"));
+        assertEquals("Result message key has the incorrect value", "Invalid Token.", json.get("message").asText());
+
+        try {
+            verify(tokenService).updateRefreshToken(eq(FAKE_REFRESH_TOKEN), eq(FAKE_CLIENT_ID));
+        } catch (InvalidTokenException e) {
+            e.printStackTrace();
+            fail("An exception should not be thrown");
+        }
+    }
+
+    @Test
+    public void testLogout() {
+        Result result = controller.logout();
+        assertEquals("Logging out did not redirect to login page", routes.SimpleLoginController.showLoginPage().url(), result.redirectLocation().get());
+        verify(session).remove(eq("uId"));
     }
 }

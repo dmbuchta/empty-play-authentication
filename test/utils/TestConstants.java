@@ -36,5 +36,6 @@ public class TestConstants {
     public static final String FAKE_ACCESS_TOKEN = "FAKE_ACCESS_TOKEN";
     public static final String FAKE_REFRESH_TOKEN = "FAKE_REFRESH_TOKEN";
 
-
+    public static final String FAKE_ACCESS_TOKEN_2 = "FAKE_ACCESS_TOKEN_2";
+    public static final String FAKE_REFRESH_TOKEN_2 = "FAKE_REFRESH_TOKEN_2";
 }
