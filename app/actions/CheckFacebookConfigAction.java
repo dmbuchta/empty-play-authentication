@@ -18,7 +18,6 @@ import static play.mvc.Http.Status.NOT_IMPLEMENTED;
 /**
  * Created by Dan on 11/27/2016.
  */
-@Singleton
 public class CheckFacebookConfigAction extends Action.Simple {
 
     public static final String ACCESS_TOKEN = "ACCESS_TOKEN";

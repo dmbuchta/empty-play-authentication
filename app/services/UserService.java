@@ -13,12 +13,12 @@ import javax.inject.Inject;
 /**
  * Created by Dan on 11/28/2016.
  */
-public class AccountService {
+public class UserService {
 
     private final UserRepository repository;
 
     @Inject
-    public AccountService(UserRepository repository) {
+    public UserService(UserRepository repository) {
         this.repository = repository;
     }
 
@@ -28,7 +28,7 @@ public class AccountService {
         String encryptedPass = Utils.encryptString(user.getEmail() + user.getPassword());
         user.setEncryptedPassword(encryptedPass);
         try {
-            repository.save(user, true);
+            repository.saveAndFlush(user);
         } catch (Exception e) {
             if (Utils.isUniqueKeyViolation(e)) {
                 Logger.debug("Duplicate Account Found!");

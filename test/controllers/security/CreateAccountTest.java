@@ -10,35 +10,37 @@ import play.Configuration;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Result;
-import services.AccountService;
+import services.SessionCache;
+import services.UserService;
 import services.exceptions.DuplicateEntityException;
 import utils.TestUtils;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static play.mvc.Http.Status.OK;
+import static utils.TestConstants.FAKE_SESSION_ID;
 import static utils.TestConstants.FAKE_USER_ID;
+import static utils.TestConstants.SESSION_ID_PARAM;
 
 /**
  * Created by Dan on 11/20/2016.
  */
 public class CreateAccountTest extends LoginControllerTest {
     @Mock
-    private AccountService.NewUserForm newUserInput;
+    private UserService.NewUserForm newUserInput;
     @Mock
-    protected Form<AccountService.NewUserForm> newUserForm;
+    protected Form<UserService.NewUserForm> newUserForm;
     @Mock
-    private AccountService accountService;
+    private UserService userService;
     @Mock
     private Configuration configuration;
-
     @InjectMocks
     private SimpleLoginController controller;
 
     @Override
     public void setUp() {
         super.setUp();
-        when(formFactory.form(AccountService.NewUserForm.class)).thenReturn(newUserForm);
+        when(formFactory.form(UserService.NewUserForm.class)).thenReturn(newUserForm);
         when(newUserForm.bindFromRequest()).thenReturn(newUserForm);
         when(newUserForm.get()).thenReturn(newUserInput);
     }
@@ -56,7 +58,8 @@ public class CreateAccountTest extends LoginControllerTest {
 
         try {
             verify(newUserForm, times(2)).hasErrors();
-            verify(accountService, never()).createNewAccount(newUserInput);
+            verify(userService, never()).createNewAccount(newUserInput);
+            verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
         } catch (PSQLException e) {
             fail("This should never happen (2)");
         }
@@ -67,7 +70,7 @@ public class CreateAccountTest extends LoginControllerTest {
         Logger.debug("Testing creating an account that already exists");
         when(newUserForm.hasErrors()).thenReturn(false);
         try {
-            when(accountService.createNewAccount(newUserInput)).thenThrow(new DuplicateEntityException());
+            when(userService.createNewAccount(newUserInput)).thenThrow(new DuplicateEntityException());
         } catch (PSQLException e) {
             fail("This should never happen (1)");
         }
@@ -82,7 +85,9 @@ public class CreateAccountTest extends LoginControllerTest {
         assertFalse("Response does not have correct success value", json.get("success").asBoolean());
 
         try {
-            verify(accountService).createNewAccount(newUserInput);
+            verify(userService).createNewAccount(newUserInput);
+            verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
+
         } catch (PSQLException e) {
             fail("This should never happen (2)");
         }
@@ -96,9 +101,8 @@ public class CreateAccountTest extends LoginControllerTest {
 
         when(newUserForm.hasErrors()).thenReturn(false);
         when(newUserForm.get()).thenReturn(newUserInput);
-        when(session.get(eq("uId"))).thenReturn(FAKE_USER_ID + "");
         try {
-            when(accountService.createNewAccount(newUserInput)).thenReturn(user);
+            when(userService.createNewAccount(newUserInput)).thenReturn(user);
         } catch (PSQLException e) {
             fail("This should never happen (1)");
         }
@@ -111,10 +115,10 @@ public class CreateAccountTest extends LoginControllerTest {
         assertTrue("Response does not have correct success value", json.get("success").asBoolean());
         assertTrue("Response does not have the url key", json.has("url"));
         assertEquals("Response does not have correct url value", controllers.secured.html.routes.UserController.index().url(), json.get("url").asText());
-        assertTrue("User is not being stored on session", Authenticator.isUserLoggedIn(context));
 
         try {
-            verify(accountService).createNewAccount(newUserInput);
+            verify(userService).createNewAccount(newUserInput);
+            verify(sessionCache).addUserToCache(anyString(), eq(user));
         } catch (PSQLException e) {
             fail("This should never happen (2)");
         }

@@ -3,7 +3,7 @@ package models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.validator.constraints.NotEmpty;
 import play.data.validation.Constraints;
-import services.AccountService;
+import services.UserService;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -83,7 +83,7 @@ public class User {
         this.encryptedPassword = encryptedPassword;
     }
 
-    public static final User createNewUser(AccountService.NewUserForm newUserFormForm) {
+    public static final User createNewUser(UserService.NewUserForm newUserFormForm) {
         User user = new User();
         user.setEmail(newUserFormForm.getNewEmail().toLowerCase());
         user.setPassword(newUserFormForm.getNewPassword());

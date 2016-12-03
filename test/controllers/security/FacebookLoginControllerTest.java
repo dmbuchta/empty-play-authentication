@@ -49,11 +49,10 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
     public void testGoodLogin() {
         Logger.debug("Testing a valid login");
         User user = new User();
-        user.setId(FAKE_USER_ID);
+        user.setEmail(FAKE_EMAIL);
 
         when(loginForm.hasErrors()).thenReturn(false);
         when(loginService.login(loginForm)).thenReturn(CompletableFuture.completedFuture(user));
-        when(session.get(eq("uId"))).thenReturn(user.getId() + "");
 
         Result result = getResultFromController(controller);
         JsonNode json = parseResult(result);
@@ -62,9 +61,9 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         assertTrue("Result success key has the incorrect value", json.get("success").asBoolean());
         assertTrue("Response does not have the url key", json.has("url"));
         assertEquals("Response does not have correct url value", controllers.secured.html.routes.UserController.index().url(), json.get("url").asText());
-        assertTrue("User is not being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);
+        verify(sessionCache).addUserToCache(anyString(), eq(user));
     }
 
     @Test
@@ -82,9 +81,10 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         assertEquals("Result message key has the incorrect value", json.get("message").asText(), "No account");
         assertTrue("Result does not have email key", json.has("email"));
         assertEquals("Result email key has the incorrect value", json.get("email").asText(), FAKE_EMAIL);
-        assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
+
     }
 
     @Test
@@ -101,9 +101,9 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
         assertTrue("Result does not have message key", json.has("message"));
         assertEquals("Result message key has the incorrect value", json.get("message").asText(), "There was a problem with your login");
-        assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -120,9 +120,9 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
         assertTrue("Result does not have message key", json.has("message"));
         assertEquals("Result message key has the incorrect value", json.get("message").asText(), "There was a problem with your login");
-        assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -137,6 +137,7 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
 
         verify(loginService, never()).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -165,10 +166,10 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         assertEquals("Incorrect REFRESH_TOKEN key value", json.get(ApiAuthenticator.REFRESH_TOKEN).asText(), refreshToken.getToken());
         assertTrue("No ACCESS_TOKEN key", json.has(ApiAuthenticator.ACCESS_TOKEN));
         assertEquals("Incorrect ACCESS_TOKEN key value", json.get(ApiAuthenticator.ACCESS_TOKEN).asText(), refreshToken.getAccessToken());
-        assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
 
 
         verify(loginService).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -186,9 +187,9 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         assertEquals("Result message key has the incorrect value", json.get("message").asText(), "No account");
         assertTrue("Result does not have email key", json.has("email"));
         assertEquals("Result email key has the incorrect value", json.get("email").asText(), FAKE_EMAIL);
-        assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -205,9 +206,9 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
         assertTrue("Result does not have message key", json.has("message"));
         assertEquals("Result message key has the incorrect value", json.get("message").asText(), "There was a problem with your login");
-        assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -224,9 +225,9 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
         assertTrue("Result does not have message key", json.has("message"));
         assertEquals("Result message key has the incorrect value", json.get("message").asText(), "There was a problem with your login");
-        assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -241,6 +242,7 @@ public class FacebookLoginControllerTest extends LoginControllerTest {
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
 
         verify(loginService, never()).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Override

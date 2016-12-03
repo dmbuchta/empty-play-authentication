@@ -59,7 +59,7 @@ public class SimpleTokenService implements TokenService {
     }
 
     @Override
-    public boolean isValidAccessToken(String accessToken) {
-        return tokenCache.getUser(accessToken) != null;
+    public User getUser(String accessToken) {
+        return tokenCache.getUser(accessToken);
     }
 }

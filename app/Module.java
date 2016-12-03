@@ -10,6 +10,7 @@ import repositories.impl.JpaTokenRepository;
 import repositories.impl.JpaUserRepository;
 import repositories.impl.UnboundJpaUserRepo;
 import services.AccessTokenCache;
+import services.SessionCache;
 import services.login.LoginService;
 import services.login.impl.FacebookLoginService;
 import services.login.impl.GoogleLoginService;
@@ -31,10 +32,8 @@ public class Module extends AbstractModule {
 
     @Override
     public void configure() {
-        bind(CheckGoogleConfigAction.class).asEagerSingleton();
-        bind(CheckFacebookConfigAction.class).asEagerSingleton();
-        bind(CheckApiClientAction.class).asEagerSingleton();
         bind(AccessTokenCache.class).asEagerSingleton();
+        bind(SessionCache.class).asEagerSingleton();
 
         bind(DefaultHttpErrorHandler.class).to(ErrorHandler.class);
 

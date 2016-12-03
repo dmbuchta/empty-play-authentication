@@ -13,5 +13,5 @@ public interface TokenService {
 
     RefreshToken updateRefreshToken(String oldRefreshToken, String clientId) throws InvalidTokenException;
 
-    boolean isValidAccessToken(String accessToken);
+    User getUser(String accessToken);
 }

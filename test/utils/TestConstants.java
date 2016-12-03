@@ -38,4 +38,8 @@ public class TestConstants {
 
     public static final String FAKE_ACCESS_TOKEN_2 = "FAKE_ACCESS_TOKEN_2";
     public static final String FAKE_REFRESH_TOKEN_2 = "FAKE_REFRESH_TOKEN_2";
+
+    public static final String SESSION_ID_PARAM = "SESSION_ID_PARAM";
+    public static final String FAKE_SESSION_ID = "FAKE_SESSION_ID";
+
 }

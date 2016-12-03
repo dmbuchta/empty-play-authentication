@@ -5,7 +5,6 @@ import models.User;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import play.Logger;
 import repositories.TokenRepository;
 import services.AccessTokenCache;
 import services.exceptions.InvalidTokenException;
@@ -13,7 +12,6 @@ import services.oauth.impl.SimpleTokenService;
 import utils.UnitTest;
 
 import javax.persistence.NoResultException;
-
 import java.util.Date;
 
 import static org.junit.Assert.*;
@@ -21,9 +19,7 @@ import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static utils.TestConstants.FAKE_CLIENT_ID;
 import static utils.TestConstants.WRONG_FAKE_CLIENT_ID;
 
@@ -68,22 +64,22 @@ public class SimpleTokenServiceTest extends UnitTest {
     }
 
     @Test
-    public void testIsValidAccessTokenOnValidToken() {
+    public void testGetUserOnValidToken() {
         RefreshToken refreshToken = new RefreshToken(user, FAKE_CLIENT_ID);
         when(accessTokenCache.getUser(eq(refreshToken.getAccessToken()))).thenReturn(user);
-        boolean isValid = tokenService.isValidAccessToken(refreshToken.getAccessToken());
+        User returnedUser = tokenService.getUser(refreshToken.getAccessToken());
 
-        assertTrue("Is valid method returned wrong value", isValid);
+        assertEquals("Get user returned the wrong value", user, returnedUser);
         verify(accessTokenCache).getUser(eq(refreshToken.getAccessToken()));
     }
 
     @Test
-    public void testIsValidAccessTokenOnInvalidToken() {
+    public void testGetUserOnInvalidToken() {
         RefreshToken refreshToken = new RefreshToken(user, FAKE_CLIENT_ID);
         when(accessTokenCache.getUser(eq(refreshToken.getAccessToken()))).thenReturn(null);
-        boolean isValid = tokenService.isValidAccessToken(refreshToken.getAccessToken());
+        User returnedUser = tokenService.getUser(refreshToken.getAccessToken());
 
-        assertFalse("Is valid method returned wrong value", isValid);
+        assertEquals("Get user returned wrong value", null, returnedUser);
         verify(accessTokenCache).getUser(eq(refreshToken.getAccessToken()));
     }
 
@@ -93,8 +89,7 @@ public class SimpleTokenServiceTest extends UnitTest {
         when(repository.find(refreshToken.getToken())).thenReturn(null);
         try {
             tokenService.updateRefreshToken(refreshToken.getToken(), refreshToken.getClientId());
-        }
-        catch (InvalidTokenException e) {
+        } catch (InvalidTokenException e) {
             assertTrue("Invalid Token Exception has the wrong error message", e.getMessage().equals("Invalid Refresh Token"));
             verify(repository).find(refreshToken.getToken());
             return;
@@ -108,8 +103,7 @@ public class SimpleTokenServiceTest extends UnitTest {
         when(repository.find(refreshToken.getToken())).thenReturn(refreshToken);
         try {
             tokenService.updateRefreshToken(refreshToken.getToken(), WRONG_FAKE_CLIENT_ID);
-        }
-        catch (InvalidTokenException e) {
+        } catch (InvalidTokenException e) {
             assertTrue("Invalid Token Exception has the wrong error message", e.getMessage().equals("Invalid client ID"));
             verify(repository).find(refreshToken.getToken());
             return;
@@ -124,8 +118,7 @@ public class SimpleTokenServiceTest extends UnitTest {
         when(repository.find(refreshToken.getToken())).thenReturn(refreshToken);
         try {
             tokenService.updateRefreshToken(refreshToken.getToken(), refreshToken.getClientId());
-        }
-        catch (InvalidTokenException e) {
+        } catch (InvalidTokenException e) {
             assertTrue("Invalid Token Exception has the wrong error message", e.getMessage().equals("Token has expired"));
             verify(repository).find(refreshToken.getToken());
             return;

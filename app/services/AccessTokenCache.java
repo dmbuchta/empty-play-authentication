@@ -5,6 +5,7 @@ import models.User;
 import play.Configuration;
 import play.Logger;
 import play.cache.CacheApi;
+import play.cache.NamedCache;
 import utils.Configs;
 
 import javax.inject.Inject;
@@ -21,7 +22,7 @@ public class AccessTokenCache {
     private CacheApi cache;
 
     @Inject
-    public AccessTokenCache(CacheApi cache, Configuration configuration) {
+    public AccessTokenCache(@NamedCache("token-cache") CacheApi cache, Configuration configuration) {
         Logger.debug("Initializing Token Cache");
 
         accessTokenSecondsUntilExpiration = configuration.getInt(Configs.API_ACCESS_TOKEN_LENGTH, DEFAULT_ACCESS_TOKEN_EXPIRATION_IN_SECONDS);

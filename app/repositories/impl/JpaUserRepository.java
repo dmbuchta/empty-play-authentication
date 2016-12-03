@@ -36,12 +36,14 @@ public class JpaUserRepository implements UserRepository {
     }
 
     @Override
-    public void save(User user, boolean flushImmediately) throws PSQLException {
+    public void save(User user) {
         jpaApi.em().persist(user);
-        if ( flushImmediately )
-        {
-            jpaApi.em().flush();
-        }
+    }
+
+    @Override
+    public void saveAndFlush(User user) throws PSQLException {
+        jpaApi.em().persist(user);
+        jpaApi.em().flush();
     }
 
     @Override

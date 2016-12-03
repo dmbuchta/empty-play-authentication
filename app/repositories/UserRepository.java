@@ -14,7 +14,9 @@ public interface UserRepository {
 
     User findByEmail(String email) throws NoResultException;
 
-    void save(User user, boolean flushImmediately) throws PSQLException;
+    void save(User user);
+
+    void saveAndFlush(User user) throws PSQLException;
 
     void edit(User user);
 }

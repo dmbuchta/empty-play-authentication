@@ -15,6 +15,7 @@ import play.db.jpa.JPAApi;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.With;
+import services.SessionCache;
 import services.exceptions.EnfException;
 import services.login.LoginService;
 import services.login.impl.FacebookLoginService;
@@ -22,6 +23,7 @@ import services.oauth.TokenService;
 import utils.Utils;
 
 import javax.inject.Inject;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -34,13 +36,16 @@ public class FacebookLoginController extends BaseController implements LoginCont
     private FormFactory formFactory;
     private LoginService loginService;
     private TokenService tokenService;
+    private SessionCache sessionCache;
 
     @Inject
-    public FacebookLoginController(FormFactory formFactory, @Named("facebook") LoginService loginService, TokenService tokenService, JPAApi jpaApi) {
+    public FacebookLoginController(FormFactory formFactory, @Named("facebook") LoginService loginService,
+                                   TokenService tokenService, JPAApi jpaApi, SessionCache sessionCache) {
         this.formFactory = formFactory;
         this.loginService = loginService;
         this.tokenService = tokenService;
         this.jpaApi = jpaApi;
+        this.sessionCache = sessionCache;
     }
 
 
@@ -53,7 +58,9 @@ public class FacebookLoginController extends BaseController implements LoginCont
         }
         final Http.Context ctx = ctx();
         return loginService.login(loginForm).thenApply(user -> {
-            Authenticator.setUser(ctx, (User) user);
+            String sessionId = UUID.randomUUID().toString();
+            Authenticator.setSessionId(ctx, sessionId);
+            sessionCache.addUserToCache(sessionId, (User) user);
             ObjectNode responseJson = Utils.createAjaxResponse(true);
             responseJson.put("url", controllers.secured.html.routes.UserController.index().url());
             return ok(responseJson);

@@ -1,4 +1,4 @@
-package services.accountservice;
+package services.userservice;
 
 import models.User;
 import org.junit.Test;
@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.postgresql.util.PSQLException;
 import play.Logger;
 import repositories.UserRepository;
-import services.AccountService;
+import services.UserService;
 import services.exceptions.DuplicateEntityException;
 import utils.UnitTest;
 
@@ -24,16 +24,16 @@ import static utils.TestConstants.FAKE_PASS;
  */
 public class CreateNewUserTest extends UnitTest {
 
-    private AccountService.NewUserForm newUserForm;
+    private UserService.NewUserForm newUserForm;
     @Mock
     private UserRepository repository;
     @InjectMocks
-    private AccountService accountService;
+    private UserService userService;
 
     @Override
     public void setUp() {
         super.setUp();
-        newUserForm = new AccountService.NewUserForm();
+        newUserForm = new UserService.NewUserForm();
         newUserForm.setNewEmail(FAKE_EMAIL);
         newUserForm.setNewPassword(FAKE_PASS);
     }
@@ -47,12 +47,12 @@ public class CreateNewUserTest extends UnitTest {
     public void testCreatingNewUser() {
         Logger.debug("Running New User Test");
         try {
-            doNothing().when(repository).save(any(User.class), eq(true));
-            User user = accountService.createNewAccount(newUserForm);
+            doNothing().when(repository).saveAndFlush(any(User.class));
+            User user = userService.createNewAccount(newUserForm);
             assertTrue("Expected the user's email to match", user.getEmail().equalsIgnoreCase(newUserForm.getNewEmail()));
             assertTrue("Expected the user's password to match", user.getPassword().equals(newUserForm.getNewPassword()));
             assertTrue("Expected the user's date to not be null", user.getCreationDate() != null);
-            verify(repository).save(any(User.class), eq(true));
+            verify(repository).saveAndFlush(any(User.class));
         } catch (PSQLException e) {
             fail("Somehow, a PSQLException was thrown...");
         }
@@ -64,11 +64,11 @@ public class CreateNewUserTest extends UnitTest {
         Exception exception = mock(PSQLException.class);
         when(exception.getMessage()).thenReturn("violates unique constraint");
         try {
-            doThrow(exception).when(repository).save(any(User.class), eq(true));
-            accountService.createNewAccount(newUserForm);
+            doThrow(exception).when(repository).saveAndFlush(any(User.class));
+            userService.createNewAccount(newUserForm);
         } catch (DuplicateEntityException e) {
             try {
-                verify(repository).save(any(User.class), eq(true));
+                verify(repository).saveAndFlush(any(User.class));
             } catch (PSQLException e1) {
                 fail("Somehow, a PSQLException was thrown (1)...");
             }

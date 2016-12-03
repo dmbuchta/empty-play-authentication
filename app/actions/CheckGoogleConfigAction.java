@@ -9,7 +9,6 @@ import play.mvc.Result;
 import utils.Configs;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -18,7 +17,6 @@ import static play.mvc.Http.Status.NOT_IMPLEMENTED;
 /**
  * Created by Dan on 11/27/2016.
  */
-@Singleton
 public class CheckGoogleConfigAction extends Action.Simple {
 
     public static final String CLIENT_ID = "CLIENT_ID";

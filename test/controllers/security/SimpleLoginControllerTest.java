@@ -10,7 +10,7 @@ import play.Configuration;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Result;
-import services.AccountService;
+import services.UserService;
 import services.exceptions.EnfException;
 import services.exceptions.InvalidTokenException;
 
@@ -32,7 +32,7 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
     @Mock
     private Form<SimpleLoginController.RefreshTokenForm> tokenForm;
     @Mock
-    private AccountService accountService;
+    private UserService userService;
     @Mock
     private Configuration configuration;
 
@@ -56,13 +56,13 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
         user.setId(FAKE_USER_ID);
         when(loginForm.hasErrors()).thenReturn(false);
         when(loginService.login(loginForm)).thenReturn(CompletableFuture.completedFuture(user));
-        when(session.get(eq("uId"))).thenReturn(FAKE_USER_ID + "");
 
         Result result = getResultFromController(controller);
         assertEquals("Did not redirect after logging in", result.status(), SEE_OTHER);
         assertEquals("Did not redirect to home page", controllers.secured.html.routes.UserController.index().url(), result.redirectLocation().get());
-        assertTrue("User is not being stored on session", Authenticator.isUserLoggedIn(context));
+
         verify(loginService).login(loginForm);
+        verify(sessionCache).addUserToCache(anyString(), eq(user));
     }
 
     @Test
@@ -78,6 +78,7 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
             Logger.warn("Template cannot be rendered because the form is mocked", npe);
         }
         verify(loginService).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -91,6 +92,7 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
             Logger.warn("Template cannot be rendered because the form is mocked", npe);
         }
         verify(loginService, never()).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -118,6 +120,7 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
 
         verify(loginService).login(loginForm);
         verify(tokenService).createRefreshToken(eq(user), eq(FAKE_CLIENT_ID));
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -135,6 +138,7 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
         assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -147,6 +151,7 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
 
         verify(loginService, never()).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -159,6 +164,7 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
 
         verify(loginService, never()).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -194,6 +200,7 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
             e.printStackTrace();
             fail("An exception should not be thrown");
         }
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -223,12 +230,16 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
             e.printStackTrace();
             fail("An exception should not be thrown");
         }
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
     public void testLogout() {
+        when(session.remove(eq(SESSION_ID_PARAM))).thenReturn(FAKE_SESSION_ID);
+
         Result result = controller.logout();
         assertEquals("Logging out did not redirect to login page", routes.SimpleLoginController.showLoginPage().url(), result.redirectLocation().get());
-        verify(session).remove(eq("uId"));
+        verify(session).remove(eq(SESSION_ID_PARAM));
+        verify(sessionCache).removeFromCache(eq(FAKE_SESSION_ID));
     }
 }

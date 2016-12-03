@@ -1,10 +1,12 @@
 package controllers.security;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import models.User;
 import play.Logger;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
+import services.SessionCache;
 import services.oauth.TokenService;
 import utils.Utils;
 
@@ -20,29 +22,38 @@ public class ApiAuthenticator extends Security.Authenticator {
     public static final String REFRESH_TOKEN = "refreshToken";
 
     private TokenService tokenService;
+    private SessionCache sessionCache;
     private boolean isAccessTokenProvided;
 
     @Inject
-    public ApiAuthenticator(TokenService tokenService) {
+    public ApiAuthenticator(TokenService tokenService, SessionCache sessionCache) {
         super();
         this.tokenService = tokenService;
+        this.sessionCache = sessionCache;
     }
 
     @Override
     public String getUsername(Http.Context ctx) {
-        if (!Authenticator.isUserLoggedIn(ctx)) {
+        User user = null;
+        String sessionId = ctx.session().get(Authenticator.SESSION_ID_PARAM);
+        if (sessionId != null) {
+            user = sessionCache.getUser(sessionId);
+        }
+        if (user == null) {
             String accessToken = getAccessToken(ctx);
             if (accessToken == null) {
                 Logger.warn("Access Token is not provided");
                 return null;
             }
             isAccessTokenProvided = true;
-            if (!tokenService.isValidAccessToken(accessToken)) {
+            user = tokenService.getUser(accessToken);
+            if (user == null) {
                 Logger.warn("Access Token is invalid or expired");
                 return null;
             }
         }
-        return "1";
+        ctx.args.put(Authenticator.CTX_USER_PARAM, user);
+        return user.getEmail();
     }
 
     @Override

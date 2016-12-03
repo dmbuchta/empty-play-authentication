@@ -28,12 +28,18 @@ public class UnboundJpaUserRepo extends JpaUserRepository {
     }
 
     @Override
-    public void save(User user, boolean flushImmediately) throws PSQLException {
+    public void save(User user) {
+        jpaApi.withTransaction(() -> super.save(user));
+    }
+
+
+    @Override
+    public void saveAndFlush(User user) throws PSQLException {
         // this was an ugly work around to get the PSQL exception to be thrown from the lambda
         try {
             jpaApi.withTransaction(() -> {
                 try {
-                    super.save(user, flushImmediately);
+                    super.saveAndFlush(user);
                 } catch (PSQLException e) {
                     throw new RuntimeException(e);
                 }

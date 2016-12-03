@@ -7,18 +7,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import play.mvc.Http;
 import play.mvc.Result;
+import services.SessionCache;
 import services.oauth.TokenService;
 import utils.UnitTest;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static play.mvc.Http.Status.UNAUTHORIZED;
-import static utils.TestConstants.FAKE_ACCESS_TOKEN;
-import static utils.TestConstants.FAKE_USER_ID;
+import static utils.TestConstants.*;
 import static utils.TestUtils.parseResult;
 
 /**
@@ -34,6 +36,8 @@ public class ApiAuthenticatorTest extends UnitTest {
     Http.Session session;
     @Mock
     private TokenService tokenService;
+    @Mock
+    private SessionCache sessionCache;
     @InjectMocks
     private ApiAuthenticator authenticator;
 
@@ -41,6 +45,8 @@ public class ApiAuthenticatorTest extends UnitTest {
     @Override
     public void setUp() {
         super.setUp();
+        Map<String, Object> contextArgs = new HashMap<>();
+        context.args = contextArgs;
         when(context.session()).thenReturn(session);
         when(context.request()).thenReturn(request);
     }
@@ -81,11 +87,13 @@ public class ApiAuthenticatorTest extends UnitTest {
     @Test
     public void testGetUsernameWithLoggedInUser() {
         User user = new User();
-        user.setId(FAKE_USER_ID);
-        when(session.get(eq("uId"))).thenReturn(FAKE_USER_ID + "");
+        user.setEmail(FAKE_EMAIL);
+        when(session.get(eq(SESSION_ID_PARAM))).thenReturn(FAKE_SESSION_ID);
+        when(sessionCache.getUser(eq(FAKE_SESSION_ID))).thenReturn(user);
 
-        assertEquals("Username should have been returned.", "1", authenticator.getUsername(context));
-        verify(tokenService, never()).isValidAccessToken(anyString());
+        assertEquals("Username should have been returned.", FAKE_EMAIL, authenticator.getUsername(context));
+        verify(tokenService, never()).getUser(anyString());
+        verify(sessionCache).getUser(eq(FAKE_SESSION_ID));
     }
 
     @Test
@@ -93,24 +101,30 @@ public class ApiAuthenticatorTest extends UnitTest {
         when(request.getHeader(eq(ApiAuthenticator.ACCESS_TOKEN_HEADER))).thenReturn(null);
 
         assertEquals("Username should not have been returned.", null, authenticator.getUsername(context));
-        verify(tokenService, never()).isValidAccessToken(eq(FAKE_ACCESS_TOKEN));
+        verify(tokenService, never()).getUser(eq(FAKE_ACCESS_TOKEN));
+        verify(sessionCache, never()).getUser(anyString());
     }
 
     @Test
     public void testGetUsernameWithValidToken() {
-        when(request.getHeader(eq(ApiAuthenticator.ACCESS_TOKEN_HEADER))).thenReturn(FAKE_ACCESS_TOKEN);
-        when(tokenService.isValidAccessToken(eq(FAKE_ACCESS_TOKEN))).thenReturn(true);
+        User user = new User();
+        user.setEmail(FAKE_EMAIL);
 
-        assertEquals("Username should have been returned.", "1", authenticator.getUsername(context));
-        verify(tokenService).isValidAccessToken(eq(FAKE_ACCESS_TOKEN));
+        when(request.getHeader(eq(ApiAuthenticator.ACCESS_TOKEN_HEADER))).thenReturn(FAKE_ACCESS_TOKEN);
+        when(tokenService.getUser(eq(FAKE_ACCESS_TOKEN))).thenReturn(user);
+
+        assertEquals("Username should have been returned.", FAKE_EMAIL, authenticator.getUsername(context));
+        verify(tokenService).getUser(eq(FAKE_ACCESS_TOKEN));
+        verify(sessionCache, never()).getUser(anyString());
     }
 
     @Test
     public void testGetUsernameWithAnExpiredToken() {
         when(request.getHeader(eq(ApiAuthenticator.ACCESS_TOKEN_HEADER))).thenReturn(FAKE_ACCESS_TOKEN);
-        when(tokenService.isValidAccessToken(eq(FAKE_ACCESS_TOKEN))).thenReturn(false);
+        when(tokenService.getUser(eq(FAKE_ACCESS_TOKEN))).thenReturn(null);
 
         assertEquals("Username should not have been returned.", null, authenticator.getUsername(context));
-        verify(tokenService).isValidAccessToken(eq(FAKE_ACCESS_TOKEN));
+        verify(tokenService).getUser(eq(FAKE_ACCESS_TOKEN));
+        verify(sessionCache, never()).getUser(anyString());
     }
 }

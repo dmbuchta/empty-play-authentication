@@ -47,11 +47,10 @@ public class GoogleLoginControllerTest extends LoginControllerTest {
     public void testGoodLogin() {
         Logger.debug("Testing a valid login");
         User user = new User();
-        user.setId(FAKE_USER_ID);
+        user.setEmail(FAKE_EMAIL);
 
         when(loginForm.hasErrors()).thenReturn(false);
         when(loginService.login(loginForm)).thenReturn(CompletableFuture.completedFuture(user));
-        when(session.get(eq("uId"))).thenReturn(FAKE_USER_ID + "");
 
         Result result = getResultFromController(controller);
         JsonNode json = parseResult(result);
@@ -60,9 +59,9 @@ public class GoogleLoginControllerTest extends LoginControllerTest {
         assertTrue("Result success key has the incorrect value", json.get("success").asBoolean());
         assertTrue("Response does not have the url key", json.has("url"));
         assertEquals("Response does not have correct url value", controllers.secured.html.routes.UserController.index().url(), json.get("url").asText());
-        assertTrue("User is not being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);
+        verify(sessionCache).addUserToCache(anyString(), eq(user));
     }
 
     @Test
@@ -79,9 +78,10 @@ public class GoogleLoginControllerTest extends LoginControllerTest {
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
         assertTrue("Result does not have message key", json.has("message"));
         assertEquals("Result message key has the incorrect value", json.get("message").asText(), "No account");
-        assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
+
     }
 
     @Test
@@ -101,6 +101,7 @@ public class GoogleLoginControllerTest extends LoginControllerTest {
         assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -113,7 +114,9 @@ public class GoogleLoginControllerTest extends LoginControllerTest {
         assertTrue("Result does not have formErrors key", json.has("formErrors"));
         assertTrue("Result does not have success key", json.has("success"));
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
+
         verify(loginService, never()).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -125,6 +128,7 @@ public class GoogleLoginControllerTest extends LoginControllerTest {
         refreshToken.setToken(FAKE_REFRESH_TOKEN);
 
         User user = new User();
+        user.setEmail(FAKE_EMAIL);
         user.setId(FAKE_USER_ID);
 
         when(loginForm.hasErrors()).thenReturn(false);
@@ -144,7 +148,9 @@ public class GoogleLoginControllerTest extends LoginControllerTest {
         assertTrue("No ACCESS_TOKEN key", json.has(ApiAuthenticator.ACCESS_TOKEN));
         assertEquals("Incorrect ACCESS_TOKEN key value", json.get(ApiAuthenticator.ACCESS_TOKEN).asText(), refreshToken.getAccessToken());
         assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
+
         verify(loginService).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -164,6 +170,7 @@ public class GoogleLoginControllerTest extends LoginControllerTest {
         assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -183,6 +190,7 @@ public class GoogleLoginControllerTest extends LoginControllerTest {
         assertFalse("User is being stored on session", Authenticator.isUserLoggedIn(context));
 
         verify(loginService).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Test
@@ -196,6 +204,7 @@ public class GoogleLoginControllerTest extends LoginControllerTest {
         assertTrue("Result does not have success key", json.has("success"));
         assertFalse("Result success key has the incorrect value", json.get("success").asBoolean());
         verify(loginService, never()).login(loginForm);
+        verify(sessionCache, never()).addUserToCache(anyString(), any(User.class));
     }
 
     @Override

@@ -20,7 +20,6 @@ import static play.mvc.Http.Status.*;
 /**
  * Created by Dan on 11/29/2016.
  */
-@Singleton
 public class CheckApiClientAction extends Action.Simple {
 
     public static final String CLIENT_REQUEST_ARG = "CLIENT_REQUEST_ARG";

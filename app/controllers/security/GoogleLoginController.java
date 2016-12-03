@@ -14,6 +14,7 @@ import play.db.jpa.JPAApi;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.With;
+import services.SessionCache;
 import services.exceptions.EnfException;
 import services.login.LoginService;
 import services.login.impl.GoogleLoginService;
@@ -21,6 +22,7 @@ import services.oauth.TokenService;
 import utils.Utils;
 
 import javax.inject.Inject;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -33,13 +35,16 @@ public class GoogleLoginController extends BaseController implements LoginContro
     private FormFactory formFactory;
     private LoginService loginService;
     private TokenService tokenService;
+    private SessionCache sessionCache;
 
     @Inject
-    public GoogleLoginController(FormFactory formFactory, @Named("google") LoginService loginService, TokenService tokenService, JPAApi jpaApi) {
+    public GoogleLoginController(FormFactory formFactory, @Named("google") LoginService loginService,
+                                 TokenService tokenService, JPAApi jpaApi, SessionCache sessionCache) {
         this.formFactory = formFactory;
         this.loginService = loginService;
         this.tokenService = tokenService;
         this.jpaApi = jpaApi;
+        this.sessionCache = sessionCache;
     }
 
     @Override
@@ -51,7 +56,9 @@ public class GoogleLoginController extends BaseController implements LoginContro
         }
         final Http.Context ctx = ctx();
         return loginService.login(loginForm).thenApply(user -> {
-            Authenticator.setUser(ctx, (User) user);
+            String sessionId = UUID.randomUUID().toString();
+            Authenticator.setSessionId(ctx, sessionId);
+            sessionCache.addUserToCache(sessionId, (User) user);
             ObjectNode responseJson = Utils.createAjaxResponse(true);
             responseJson.put("url", controllers.secured.html.routes.UserController.index().url());
             return ok(responseJson);
@@ -77,7 +84,7 @@ public class GoogleLoginController extends BaseController implements LoginContro
         final String clientId = (String) ctx().args.get(CheckApiClientAction.CLIENT_REQUEST_ARG);
         return loginService.login(loginForm).thenApply(userObj -> {
             User user = (User) userObj;
-            RefreshToken refreshToken = jpaApi.withTransaction(() ->tokenService.createRefreshToken(user, clientId));
+            RefreshToken refreshToken = jpaApi.withTransaction(() -> tokenService.createRefreshToken(user, clientId));
             ObjectNode responseJson = Utils.createAjaxResponse(true);
             responseJson.put("id", user.getId());
             responseJson.put(ApiAuthenticator.REFRESH_TOKEN, refreshToken.getToken());

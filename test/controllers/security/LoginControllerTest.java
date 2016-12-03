@@ -5,6 +5,7 @@ import org.mockito.Mock;
 import play.data.FormFactory;
 import play.mvc.Http;
 import play.mvc.Result;
+import services.SessionCache;
 import services.login.LoginService;
 import services.oauth.TokenService;
 import utils.UnitTest;
@@ -32,6 +33,8 @@ public abstract class LoginControllerTest extends UnitTest {
     protected LoginService loginService;
     @Mock
     protected TokenService tokenService;
+    @Mock
+    protected SessionCache sessionCache;
     @Mock
     protected FormFactory formFactory;
 

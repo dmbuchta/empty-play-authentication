@@ -17,7 +17,8 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Results;
 import play.mvc.With;
-import services.AccountService;
+import services.SessionCache;
+import services.UserService;
 import services.exceptions.DuplicateEntityException;
 import services.exceptions.EnfException;
 import services.exceptions.InvalidTokenException;
@@ -27,6 +28,7 @@ import utils.Configs;
 import utils.Utils;
 
 import javax.inject.Inject;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -38,17 +40,20 @@ public class SimpleLoginController extends BaseController implements LoginContro
     private FormFactory formFactory;
     private LoginService loginService;
     private TokenService tokenService;
-    private AccountService accountService;
+    private UserService userService;
+    private SessionCache sessionCache;
     private final String googleClientId;
     private final String facebookAppId;
 
     @Inject
     public SimpleLoginController(FormFactory formFactory, LoginService loginService, TokenService tokenService,
-                                 AccountService accountService, Configuration configuration) {
+                                 UserService userService, Configuration configuration, SessionCache sessionCache) {
         this.formFactory = formFactory;
         this.loginService = loginService;
         this.tokenService = tokenService;
-        this.accountService = accountService;
+        this.userService = userService;
+        this.sessionCache = sessionCache;
+
         this.googleClientId = configuration.getString(Configs.GOOGLE_CLIENT_ID);
         String appId = configuration.getString(Configs.FB_APP_ID);
         if (StringUtils.isNoneBlank(appId, configuration.getString(Configs.FB_APP_SECRET))) {
@@ -63,17 +68,19 @@ public class SimpleLoginController extends BaseController implements LoginContro
     public CompletionStage<Result> login() {
         Form<User> loginForm = formFactory.form(User.class).bindFromRequest();
         if (loginForm.hasErrors()) {
-            return CompletableFuture.completedFuture(ok(views.html.login.render(loginForm, formFactory.form(AccountService.NewUserForm.class), googleClientId, facebookAppId)));
+            return CompletableFuture.completedFuture(ok(views.html.login.render(loginForm, formFactory.form(UserService.NewUserForm.class), googleClientId, facebookAppId)));
         }
         final Http.Context ctx = ctx();
         try {
             return loginService.login(loginForm).thenApplyAsync(user -> {
-                Authenticator.setUser(ctx, (User) user);
+                String sessionId = UUID.randomUUID().toString();
+                Authenticator.setSessionId(ctx, sessionId);
+                sessionCache.addUserToCache(sessionId, (User) user);
                 return redirect(controllers.secured.html.routes.UserController.index());
             });
         } catch (EnfException e) {
             return CompletableFuture.completedFuture(
-                    Results.ok(views.html.login.render(loginForm, formFactory.form(AccountService.NewUserForm.class), googleClientId, facebookAppId)));
+                    Results.ok(views.html.login.render(loginForm, formFactory.form(UserService.NewUserForm.class), googleClientId, facebookAppId)));
         }
     }
 
@@ -130,25 +137,33 @@ public class SimpleLoginController extends BaseController implements LoginContro
         if (Authenticator.isUserLoggedIn(ctx())) {
             return redirect(controllers.secured.html.routes.UserController.index());
         }
-        return ok(views.html.login.render(formFactory.form(User.class), formFactory.form(AccountService.NewUserForm.class), googleClientId, facebookAppId));
+        return ok(views.html.login.render(formFactory.form(User.class), formFactory.form(UserService.NewUserForm.class), googleClientId, facebookAppId));
     }
 
     public Result logout() {
-        Authenticator.logout(ctx());
+        String sessionId = ctx().session().remove(Authenticator.SESSION_ID_PARAM);
+        if ( sessionId != null ) {
+            ctx().args.remove(Authenticator.CTX_USER_PARAM);
+            sessionCache.removeFromCache(sessionId);
+        }
         return redirect(routes.SimpleLoginController.showLoginPage());
     }
 
 
     @Transactional
     public Result createAccount() {
-        Form<AccountService.NewUserForm> newUserForm = formFactory.form(AccountService.NewUserForm.class).bindFromRequest();
+        Form<UserService.NewUserForm> newUserForm = formFactory.form(UserService.NewUserForm.class).bindFromRequest();
         if (newUserForm.hasErrors()) {
             return ok(Utils.createAjaxResponse(newUserForm));
         }
+        final Http.Context ctx = ctx();
         ObjectNode json;
         try {
-            User user = accountService.createNewAccount(newUserForm.get());
-            Authenticator.setUser(ctx(), user);
+            User user = userService.createNewAccount(newUserForm.get());
+            String sessionId = UUID.randomUUID().toString();
+            Authenticator.setSessionId(ctx, sessionId);
+            sessionCache.addUserToCache(sessionId, user);
+
             json = Utils.createAjaxResponse(true);
             // TODO: REDIRECT TO ORIGINAL REQUEST URL!!
             json.put("url", controllers.secured.html.routes.UserController.index().url());
