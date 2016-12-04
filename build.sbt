@@ -9,7 +9,8 @@ scalaVersion := "2.11.7"
 libraryDependencies ++= Seq(
   javaJpa,
   cache,
-  javaWs
+  javaWs,
+  filters
 )
 
 libraryDependencies ++= Seq(
