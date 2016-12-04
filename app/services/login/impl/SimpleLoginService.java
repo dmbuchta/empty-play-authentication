@@ -27,15 +27,16 @@ public class SimpleLoginService implements LoginService<User> {
 
     @Override
     public CompletionStage<User> login(Form<User> form) {
-        Logger.debug("Doing a simple User login");
+        LOGGER.debug("Doing a simple User login");
         User user = form.get();
         String encryptedPass = Utils.encryptString(user.getEmail().toLowerCase() + user.getPassword());
         try {
             return CompletableFuture.completedFuture(repository.findByEmailAndPassword(user.getEmail().toLowerCase(), encryptedPass));
         } catch (NoResultException e) {
-            Logger.debug("Entity Not Found!");
+            LOGGER.debug("Entity Not Found!");
             throw new EnfException(user.getEmail());
         }
     }
 
+    private static final Logger.ALogger LOGGER = Logger.of(SimpleLoginService.class);
 }

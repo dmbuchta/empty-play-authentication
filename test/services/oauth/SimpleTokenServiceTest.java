@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import repositories.TokenRepository;
-import services.AccessTokenCache;
+import services.caches.AccessTokenCache;
 import services.exceptions.InvalidTokenException;
 import services.oauth.impl.SimpleTokenService;
 import utils.UnitTest;

@@ -10,7 +10,6 @@ import play.Configuration;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Result;
-import services.SessionCache;
 import services.UserService;
 import services.exceptions.DuplicateEntityException;
 import utils.TestUtils;
@@ -18,9 +17,7 @@ import utils.TestUtils;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static play.mvc.Http.Status.OK;
-import static utils.TestConstants.FAKE_SESSION_ID;
 import static utils.TestConstants.FAKE_USER_ID;
-import static utils.TestConstants.SESSION_ID_PARAM;
 
 /**
  * Created by Dan on 11/20/2016.

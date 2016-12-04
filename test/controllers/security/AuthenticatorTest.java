@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import play.mvc.Http;
 import play.mvc.Result;
-import services.SessionCache;
+import services.caches.SessionCache;
 import utils.UnitTest;
 
 import java.util.HashMap;
@@ -50,11 +50,11 @@ public class AuthenticatorTest extends UnitTest {
     public void testGetUsername() {
         User user = new User();
         user.setEmail(FAKE_EMAIL);
-        when(session.get(eq(SESSION_ID_PARAM))).thenReturn(FAKE_SESSION_ID);
+        when(session.get(eq(Authenticator.SESSION_ID_PARAM))).thenReturn(FAKE_SESSION_ID);
         when(sessionCache.getUser(eq(FAKE_SESSION_ID))).thenReturn(user);
 
         assertEquals("Authenticator did not return the correct email address.", FAKE_EMAIL, authenticator.getUsername(context));
-        verify(session).get(eq(SESSION_ID_PARAM));
+        verify(session).get(eq(Authenticator.SESSION_ID_PARAM));
         verify(sessionCache).getUser(eq(FAKE_SESSION_ID));
     }
 }

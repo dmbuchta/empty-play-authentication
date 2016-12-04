@@ -17,7 +17,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Results;
 import play.mvc.With;
-import services.SessionCache;
+import services.caches.SessionCache;
 import services.UserService;
 import services.exceptions.DuplicateEntityException;
 import services.exceptions.EnfException;
@@ -142,7 +142,7 @@ public class SimpleLoginController extends BaseController implements LoginContro
 
     public Result logout() {
         String sessionId = ctx().session().remove(Authenticator.SESSION_ID_PARAM);
-        if ( sessionId != null ) {
+        if (sessionId != null) {
             ctx().args.remove(Authenticator.CTX_USER_PARAM);
             sessionCache.removeFromCache(sessionId);
         }

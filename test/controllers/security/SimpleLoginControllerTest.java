@@ -235,11 +235,11 @@ public class SimpleLoginControllerTest extends LoginControllerTest {
 
     @Test
     public void testLogout() {
-        when(session.remove(eq(SESSION_ID_PARAM))).thenReturn(FAKE_SESSION_ID);
+        when(session.remove(eq(Authenticator.SESSION_ID_PARAM))).thenReturn(FAKE_SESSION_ID);
 
         Result result = controller.logout();
         assertEquals("Logging out did not redirect to login page", routes.SimpleLoginController.showLoginPage().url(), result.redirectLocation().get());
-        verify(session).remove(eq(SESSION_ID_PARAM));
+        verify(session).remove(eq(Authenticator.SESSION_ID_PARAM));
         verify(sessionCache).removeFromCache(eq(FAKE_SESSION_ID));
     }
 }

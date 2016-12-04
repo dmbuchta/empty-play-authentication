@@ -2,7 +2,7 @@ package models;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import play.data.validation.Constraints;
-import services.AccessTokenCache;
+import services.caches.AccessTokenCache;
 
 import javax.persistence.*;
 import java.util.Calendar;

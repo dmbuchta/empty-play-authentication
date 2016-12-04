@@ -14,7 +14,7 @@ import play.db.jpa.JPAApi;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.With;
-import services.SessionCache;
+import services.caches.SessionCache;
 import services.exceptions.EnfException;
 import services.login.LoginService;
 import services.login.impl.GoogleLoginService;

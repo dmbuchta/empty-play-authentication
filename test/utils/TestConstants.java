@@ -39,7 +39,15 @@ public class TestConstants {
     public static final String FAKE_ACCESS_TOKEN_2 = "FAKE_ACCESS_TOKEN_2";
     public static final String FAKE_REFRESH_TOKEN_2 = "FAKE_REFRESH_TOKEN_2";
 
-    public static final String SESSION_ID_PARAM = "SESSION_ID_PARAM";
     public static final String FAKE_SESSION_ID = "FAKE_SESSION_ID";
+
+    public static final String FAKE_CONFIG_STRING_NAME = "FAKE_CONFIG_STRING";
+    public static final String FAKE_CONFIG_STRING_VALUE = "FAKE_CONFIG_STRING_VALUE";
+    public static final String FAKE_CONFIG_STRING_VALUE_2 = "FAKE_CONFIG_STRING_VALUE_2";
+
+    public static final String FAKE_CONFIG_INT_NAME = "FAKE_CONFIG_INT_NAME";
+    public static final int FAKE_CONFIG_INT_VALUE = 99;
+    public static final int FAKE_CONFIG_INT_VALUE_2 = 100;
+
 
 }

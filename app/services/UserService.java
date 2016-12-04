@@ -23,7 +23,7 @@ public class UserService {
     }
 
     public User createNewAccount(NewUserForm newUserForm) throws DuplicateEntityException, PSQLException {
-        Logger.debug("Creating New User");
+        LOGGER.debug("Creating New User");
         User user = User.createNewUser(newUserForm);
         String encryptedPass = Utils.encryptString(user.getEmail() + user.getPassword());
         user.setEncryptedPassword(encryptedPass);
@@ -31,14 +31,16 @@ public class UserService {
             repository.saveAndFlush(user);
         } catch (Exception e) {
             if (Utils.isUniqueKeyViolation(e)) {
-                Logger.debug("Duplicate Account Found!");
+                LOGGER.debug("Duplicate Account Found!");
                 throw new DuplicateEntityException(e);
             }
-            Logger.error("An error occurred creating user", e);
+            LOGGER.error("An error occurred creating user", e);
             throw e;
         }
         return user;
     }
+
+    private static final Logger.ALogger LOGGER = Logger.of(UserService.class);
 
     public static class NewUserForm {
 

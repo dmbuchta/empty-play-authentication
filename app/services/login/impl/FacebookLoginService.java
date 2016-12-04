@@ -25,11 +25,6 @@ import java.util.concurrent.CompletionStage;
  */
 public class FacebookLoginService implements LoginService<FacebookLoginService.FacebookLoginForm> {
 
-    // public to make testing easier
-    public static final String FB_TOKEN_ENDPOINT = "https://graph.facebook.com/debug_token";
-    public static final String FB_USER_EMAIL_ENDPOINT = "https://graph.facebook.com/v2.8/";
-    public static final String INVALID_TOKEN_RESPONSE = "Invalid Facebook Token";
-
     private UserRepository repository;
     private WSClient wsClient;
     private final String appId;
@@ -45,7 +40,7 @@ public class FacebookLoginService implements LoginService<FacebookLoginService.F
 
     @Override
     public CompletionStage<User> login(Form<FacebookLoginForm> form) {
-        Logger.debug("Doing a Facebook User login");
+        LOGGER.debug("Doing a Facebook User login");
         FacebookLoginForm loginForm = form.get();
         return verifyFacebookToken(loginForm.getInput_token())
                 .thenCombineAsync(getEmailFromFacebook(loginForm.getUserID()), (isValid, email) -> {
@@ -53,7 +48,7 @@ public class FacebookLoginService implements LoginService<FacebookLoginService.F
                         try {
                             return repository.findByEmail(email);
                         } catch (NoResultException e) {
-                            Logger.debug("Entity Not Found!");
+                            LOGGER.debug("Entity Not Found!");
                             throw new EnfException(email);
                         }
                     }
@@ -73,7 +68,7 @@ public class FacebookLoginService implements LoginService<FacebookLoginService.F
                     if (json != null && appId.equals(json.get("app_id").asText())) {
                         return json.has("is_valid") && json.get("is_valid").asBoolean();
                     }
-                    Logger.warn("App ID does not match. Someone is doing something very suspicious.");
+                    LOGGER.warn("App ID does not match. Someone is doing something very suspicious.");
                     return false;
                 });
     }
@@ -87,6 +82,12 @@ public class FacebookLoginService implements LoginService<FacebookLoginService.F
                 .thenApply(WSResponse::asJson)
                 .thenApply(jsonNode -> jsonNode.get("email").asText());
     }
+
+    // public to make testing easier
+    public static final String FB_TOKEN_ENDPOINT = "https://graph.facebook.com/debug_token";
+    public static final String FB_USER_EMAIL_ENDPOINT = "https://graph.facebook.com/v2.8/";
+    public static final String INVALID_TOKEN_RESPONSE = "Invalid Facebook Token";
+    private static final Logger.ALogger LOGGER = Logger.of(FacebookLoginService.class);
 
     public static class FacebookLoginForm {
         @NotEmpty
@@ -112,4 +113,5 @@ public class FacebookLoginService implements LoginService<FacebookLoginService.F
             this.userID = userID;
         }
     }
+
 }

@@ -19,28 +19,30 @@ import static play.mvc.Http.Status.NOT_IMPLEMENTED;
  */
 public class CheckGoogleConfigAction extends Action.Simple {
 
-    public static final String CLIENT_ID = "CLIENT_ID";
     private String clientId;
 
     @Inject
     public CheckGoogleConfigAction(Configuration configuration) {
         super();
-        Logger.debug("Looking up Google configuration");
+        LOGGER.debug("Looking up Google configuration");
         clientId = configuration.getString(Configs.GOOGLE_CLIENT_ID);
         if (StringUtils.isBlank(clientId)) {
-            Logger.debug("Google Sign in is not configured.");
+            LOGGER.debug("Google Sign in is not configured.");
         } else {
-            Logger.debug("Everything checks out.");
+            LOGGER.debug("Everything checks out.");
         }
     }
 
     @Override
     public CompletionStage<Result> call(Http.Context ctx) {
         if (StringUtils.isBlank(clientId)) {
-            Logger.warn("Google configuration is not valid! Please add the appropriate values to conf file.");
+            LOGGER.warn("Google configuration is not valid! Please add the appropriate values to conf file.");
             return CompletableFuture.completedFuture(status(NOT_IMPLEMENTED));
         }
         ctx.args.put(CLIENT_ID, clientId);
         return delegate.call(ctx);
     }
+
+    public static final String CLIENT_ID = "CLIENT_ID";
+    private static final Logger.ALogger LOGGER = Logger.of(CheckGoogleConfigAction.class);
 }

@@ -1,11 +1,10 @@
-package services.sessioncache;
+package services.caches;
 
 import models.User;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import play.cache.CacheApi;
-import services.SessionCache;
 import utils.UnitTest;
 
 import static org.junit.Assert.assertEquals;

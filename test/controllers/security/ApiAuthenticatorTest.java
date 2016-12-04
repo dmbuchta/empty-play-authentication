@@ -7,11 +7,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import play.mvc.Http;
 import play.mvc.Result;
-import services.SessionCache;
 import services.oauth.TokenService;
 import utils.UnitTest;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,11 +31,9 @@ public class ApiAuthenticatorTest extends UnitTest {
     @Mock
     Http.Context context;
     @Mock
-    Http.Session session;
-    @Mock
     private TokenService tokenService;
     @Mock
-    private SessionCache sessionCache;
+    private Authenticator sessionAuthenticator;
     @InjectMocks
     private ApiAuthenticator authenticator;
 
@@ -47,7 +43,6 @@ public class ApiAuthenticatorTest extends UnitTest {
         super.setUp();
         Map<String, Object> contextArgs = new HashMap<>();
         context.args = contextArgs;
-        when(context.session()).thenReturn(session);
         when(context.request()).thenReturn(request);
     }
 
@@ -65,13 +60,7 @@ public class ApiAuthenticatorTest extends UnitTest {
 
     @Test
     public void testUnauthorizedResponseWithInvalidAccessToken() {
-        try {
-            Field field = ApiAuthenticator.class.getDeclaredField("isAccessTokenProvided");
-            field.setAccessible(true);
-            field.setBoolean(authenticator, true);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            fail("No exception should be thrown");
-        }
+        context.args.put(ApiAuthenticator.CTX_ACCESS_TOKEN_PARAM, FAKE_ACCESS_TOKEN_2);
 
         Result result = authenticator.onUnauthorized(context);
         assertEquals("Result status is not OK", UNAUTHORIZED, result.status());
@@ -86,14 +75,11 @@ public class ApiAuthenticatorTest extends UnitTest {
 
     @Test
     public void testGetUsernameWithLoggedInUser() {
-        User user = new User();
-        user.setEmail(FAKE_EMAIL);
-        when(session.get(eq(SESSION_ID_PARAM))).thenReturn(FAKE_SESSION_ID);
-        when(sessionCache.getUser(eq(FAKE_SESSION_ID))).thenReturn(user);
+        when(sessionAuthenticator.getUsername(context)).thenReturn(FAKE_EMAIL);
 
         assertEquals("Username should have been returned.", FAKE_EMAIL, authenticator.getUsername(context));
         verify(tokenService, never()).getUser(anyString());
-        verify(sessionCache).getUser(eq(FAKE_SESSION_ID));
+        verify(sessionAuthenticator).getUsername(context);
     }
 
     @Test
@@ -102,7 +88,7 @@ public class ApiAuthenticatorTest extends UnitTest {
 
         assertEquals("Username should not have been returned.", null, authenticator.getUsername(context));
         verify(tokenService, never()).getUser(eq(FAKE_ACCESS_TOKEN));
-        verify(sessionCache, never()).getUser(anyString());
+        verify(sessionAuthenticator).getUsername(context);
     }
 
     @Test
@@ -115,7 +101,7 @@ public class ApiAuthenticatorTest extends UnitTest {
 
         assertEquals("Username should have been returned.", FAKE_EMAIL, authenticator.getUsername(context));
         verify(tokenService).getUser(eq(FAKE_ACCESS_TOKEN));
-        verify(sessionCache, never()).getUser(anyString());
+        verify(sessionAuthenticator).getUsername(context);
     }
 
     @Test
@@ -125,6 +111,6 @@ public class ApiAuthenticatorTest extends UnitTest {
 
         assertEquals("Username should not have been returned.", null, authenticator.getUsername(context));
         verify(tokenService).getUser(eq(FAKE_ACCESS_TOKEN));
-        verify(sessionCache, never()).getUser(anyString());
+        verify(sessionAuthenticator).getUsername(context);
     }
 }

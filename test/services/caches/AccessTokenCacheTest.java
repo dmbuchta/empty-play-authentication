@@ -1,4 +1,4 @@
-package services.accesstokencache;
+package services.caches;
 
 import models.RefreshToken;
 import models.User;
@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import play.Configuration;
 import play.cache.CacheApi;
-import services.AccessTokenCache;
 import utils.UnitTest;
 
 import static org.junit.Assert.assertEquals;
@@ -21,7 +20,7 @@ import static utils.TestConstants.FAKE_CLIENT_ID;
 /**
  * Created by Dan on 11/30/2016.
  */
-public class AccessTokenTest extends UnitTest {
+public class AccessTokenCacheTest extends UnitTest {
 
     private RefreshToken refreshToken;
 

@@ -25,10 +25,6 @@ import java.util.concurrent.CompletionStage;
  */
 public class GoogleLoginService implements LoginService<GoogleLoginService.GoogleLoginForm> {
 
-    // public to make testing easier
-    public static final String GOOGLE_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v3/tokeninfo";
-    public static final String INVALID_AUD_MESSAGE = "Invalid aud from Google";
-
     private UserRepository repository;
     private WSClient wsClient;
     private final String clientId;
@@ -42,7 +38,7 @@ public class GoogleLoginService implements LoginService<GoogleLoginService.Googl
 
     @Override
     public CompletionStage<User> login(Form<GoogleLoginForm> form) {
-        Logger.debug("Doing a Google User login");
+        LOGGER.debug("Doing a Google User login");
         GoogleLoginForm loginForm = form.get();
         return requestGoogleVerification(loginForm.getId_token())
                 .thenApplyAsync((json) -> {
@@ -51,11 +47,11 @@ public class GoogleLoginService implements LoginService<GoogleLoginService.Googl
                         try {
                             return repository.findByEmail(email);
                         } catch (NoResultException e) {
-                            Logger.debug("Entity Not Found!");
+                            LOGGER.debug("Entity Not Found!");
                             throw new EnfException(email);
                         }
                     }
-                    Logger.warn("Client ID does not match. Someone is doing something very suspicious.");
+                    LOGGER.warn("Client ID does not match. Someone is doing something very suspicious.");
                     throw new RuntimeException(INVALID_AUD_MESSAGE);
                 });
     }
@@ -67,6 +63,11 @@ public class GoogleLoginService implements LoginService<GoogleLoginService.Googl
                 .thenApply(Utils::debugResponse)
                 .thenApply(WSResponse::asJson);
     }
+
+    // public to make testing easier
+    public static final String GOOGLE_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v3/tokeninfo";
+    public static final String INVALID_AUD_MESSAGE = "Invalid aud from Google";
+    private static final Logger.ALogger LOGGER = Logger.of(GoogleLoginService.class);
 
     public static class GoogleLoginForm {
         @NotEmpty

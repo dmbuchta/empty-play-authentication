@@ -1,6 +1,3 @@
-import actions.CheckApiClientAction;
-import actions.CheckFacebookConfigAction;
-import actions.CheckGoogleConfigAction;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import play.http.DefaultHttpErrorHandler;
@@ -9,8 +6,8 @@ import repositories.UserRepository;
 import repositories.impl.JpaTokenRepository;
 import repositories.impl.JpaUserRepository;
 import repositories.impl.UnboundJpaUserRepo;
-import services.AccessTokenCache;
-import services.SessionCache;
+import services.caches.AccessTokenCache;
+import services.caches.SessionCache;
 import services.login.LoginService;
 import services.login.impl.FacebookLoginService;
 import services.login.impl.GoogleLoginService;

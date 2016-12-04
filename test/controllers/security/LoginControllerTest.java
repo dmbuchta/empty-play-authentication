@@ -5,7 +5,7 @@ import org.mockito.Mock;
 import play.data.FormFactory;
 import play.mvc.Http;
 import play.mvc.Result;
-import services.SessionCache;
+import services.caches.SessionCache;
 import services.login.LoginService;
 import services.oauth.TokenService;
 import utils.UnitTest;

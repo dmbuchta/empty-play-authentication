@@ -2,9 +2,11 @@ package services.oauth.impl;
 
 import models.RefreshToken;
 import models.User;
+import play.Logger;
 import repositories.TokenRepository;
-import services.AccessTokenCache;
+import services.caches.AccessTokenCache;
 import services.exceptions.InvalidTokenException;
+import services.login.impl.SimpleLoginService;
 import services.oauth.TokenService;
 
 import javax.inject.Inject;
@@ -26,6 +28,7 @@ public class SimpleTokenService implements TokenService {
 
     @Override
     public RefreshToken createRefreshToken(User user, String clientId) {
+        LOGGER.debug("Creating Refresh Token");
         RefreshToken oldRefreshToken = null;
         try {
             oldRefreshToken = repository.findByUserAndClient(user, clientId);
@@ -41,6 +44,7 @@ public class SimpleTokenService implements TokenService {
 
     @Override
     public RefreshToken updateRefreshToken(String oldRefreshTokenStr, String clientId) throws InvalidTokenException {
+        LOGGER.debug("Updating Refresh Token");
         RefreshToken oldRefreshToken = repository.find(oldRefreshTokenStr);
         if (oldRefreshToken == null) {
             throw new InvalidTokenException("Invalid Refresh Token");
@@ -62,4 +66,6 @@ public class SimpleTokenService implements TokenService {
     public User getUser(String accessToken) {
         return tokenCache.getUser(accessToken);
     }
+
+    private static final Logger.ALogger LOGGER = Logger.of(SimpleTokenService.class);
 }

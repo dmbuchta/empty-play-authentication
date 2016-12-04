@@ -4,7 +4,7 @@ import models.User;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
-import services.SessionCache;
+import services.caches.SessionCache;
 
 import javax.inject.Inject;
 
