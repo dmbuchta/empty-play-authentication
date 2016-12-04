@@ -12,9 +12,9 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 import static play.mvc.Http.Status.OK;
-import static play.test.Helpers.fakeRequest;
 import static play.test.Helpers.route;
 import static utils.TestConstants.*;
+import static utils.TestUtils.fakeRequest;
 import static utils.TestUtils.parseResult;
 
 /**

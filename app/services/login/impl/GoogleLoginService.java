@@ -3,6 +3,7 @@ package services.login.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.name.Named;
 import models.User;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import play.Configuration;
 import play.Logger;
@@ -18,6 +19,9 @@ import utils.Utils;
 
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CompletionStage;
 
 /**
@@ -25,15 +29,26 @@ import java.util.concurrent.CompletionStage;
  */
 public class GoogleLoginService implements LoginService<GoogleLoginService.GoogleLoginForm> {
 
+    private final Set<String> validClientIds;
     private UserRepository repository;
     private WSClient wsClient;
-    private final String clientId;
+    private final String myClientId;
 
     @Inject
     public GoogleLoginService(@Named("unbound") UserRepository repository, WSClient wsClient, Configuration configuration) {
         this.repository = repository;
         this.wsClient = wsClient;
-        this.clientId = configuration.getString(Configs.GOOGLE_CLIENT_ID);
+        this.myClientId = configuration.getString(Configs.GOOGLE_CLIENT_ID);
+        this.validClientIds = new HashSet<>();
+
+        String apiClientsGoogleIds = configuration.getString(Configs.GOOGLE_API_CLIENTS);
+        if (!StringUtils.isBlank(myClientId)) {
+            validClientIds.add(myClientId);
+        }
+        if (!StringUtils.isBlank(apiClientsGoogleIds)) {
+            validClientIds.addAll(Arrays.asList(apiClientsGoogleIds.split(",")));
+        }
+        LOGGER.debug("Configured valid client IDs: {}", validClientIds);
     }
 
     @Override
@@ -42,7 +57,7 @@ public class GoogleLoginService implements LoginService<GoogleLoginService.Googl
         GoogleLoginForm loginForm = form.get();
         return requestGoogleVerification(loginForm.getId_token())
                 .thenApplyAsync((json) -> {
-                    if (json.has("aud") && json.get("aud").asText("").equals(clientId)) {
+                    if (json.has("aud") && validClientIds.contains(json.get("aud").asText())) {
                         String email = json.get("email").asText();
                         try {
                             return repository.findByEmail(email);

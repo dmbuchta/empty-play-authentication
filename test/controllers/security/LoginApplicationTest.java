@@ -14,6 +14,7 @@ import static play.mvc.Http.Status.OK;
 import static play.mvc.Http.Status.SEE_OTHER;
 import static play.test.Helpers.*;
 import static utils.TestConstants.*;
+import static utils.TestUtils.fakeRequest;
 
 /**
  * Created by Dan on 11/19/2016.

@@ -2,6 +2,8 @@ package utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import play.filters.csrf.CSRFFilter;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -26,5 +28,11 @@ public class TestUtils {
             fail("Failed Parsing json response");
         }
         return null;
+    }
+
+    public static Http.RequestBuilder fakeRequest(String method, String uri) {
+        String csrfToken = CSRFFilter.apply$default$3().generateToken();
+        return play.test.Helpers.fakeRequest(method, uri + "?csrfToken=" + csrfToken)
+                .session(CSRFFilter.apply$default$1().tokenName(), csrfToken);
     }
 }

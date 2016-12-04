@@ -6,6 +6,7 @@ package utils;
 public class Configs {
 
     public static final String GOOGLE_CLIENT_ID = "sso.google.client.id";
+    public static final String GOOGLE_API_CLIENTS = "sso.google.apiClients";
 
     public static final String FB_APP_ID = "sso.fb.app.id";
     public static final String FB_APP_SECRET = "sso.fb.app.secret";

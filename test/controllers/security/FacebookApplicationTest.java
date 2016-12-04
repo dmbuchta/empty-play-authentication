@@ -12,6 +12,7 @@ import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.*;
 import static utils.TestConstants.FAKE_APP_ID;
 import static utils.TestConstants.FAKE_APP_SECRET;
+import static utils.TestUtils.fakeRequest;
 
 /**
  * Created by Dan on 11/27/2016.
